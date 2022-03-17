@@ -47,4 +47,14 @@ public class User extends BaseTimeEntity {
     public String getRoleKey() {
         return this.role.getKey();
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof User) {
+            User user = (User) obj;
+            return user.getId().equals(this.id);
+        } else {
+            return false;
+        }
+    }
 }
