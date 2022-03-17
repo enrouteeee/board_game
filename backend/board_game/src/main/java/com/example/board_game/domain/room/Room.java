@@ -69,5 +69,10 @@ public class Room {
     public int getNumberOfUsers() {
         return users.size();
     }
+
+    public boolean checkStart() {
+        // this.game.checkStart(...);
+        return true;
+    }
 }
 

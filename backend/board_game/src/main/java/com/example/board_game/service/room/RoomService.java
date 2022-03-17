@@ -29,11 +29,11 @@ public class RoomService {
     }
 
     public void updateRoom(CreateOrUpdateRoomDto dto, Long id, SessionUser user) {
+        Room room = findOne(id);
+
         User findUser = userRepository.findByEmail(user.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
 
-        Room room = roomRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 방입니다."));
         room.updateRoomInfo(dto.getName(), dto.getCapacity(), findUser);
     }
 
@@ -47,5 +47,28 @@ public class RoomService {
         }
 
         return new GetRoomHeaderListDto(list);
+    }
+
+    public void joinRoom(Long roomId, SessionUser user) {
+        Room room = findOne(roomId);
+
+        User findUser = userRepository.findByEmail(user.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
+
+        room.join(findUser);
+    }
+
+    public Room findOne(Long roomId) {
+        return roomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 방입니다."));
+    }
+
+    public void exitRoom(Long roomId, SessionUser user) {
+        Room room = findOne(roomId);
+
+        User findUser = userRepository.findByEmail(user.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
+
+        room.exit(findUser);
     }
 }
