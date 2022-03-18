@@ -71,8 +71,11 @@ public class Room {
     }
 
     public boolean checkStart() {
-        // this.game.checkStart(...);
-        return true;
+        return this.game.checkStart(getNumberOfUsers());
+    }
+
+    public void changeGame(Game game) {
+        this.game = game;
     }
 }
 
