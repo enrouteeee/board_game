@@ -19,11 +19,14 @@ public class Room {
 
     private Game game;
 
+    private boolean playing;    //게임 중인지 아닌지
+
     @Builder
     public Room(String name, int capacity, User owner) {
         this.name = name;
         this.capacity = capacity;
         this.owner = owner;
+        playing = false;
     }
 
     protected void setId(Long id) {
@@ -76,6 +79,11 @@ public class Room {
 
     public void changeGame(Game game) {
         this.game = game;
+    }
+
+    public void startGame(){
+        this.playing = true;
+        this.game.init();
     }
 }
 

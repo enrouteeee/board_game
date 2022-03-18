@@ -63,6 +63,16 @@ public class RoomService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 방입니다."));
     }
 
+    public boolean startGame(Long roomId) {
+        Room room = findOne(roomId);
+        if(room.checkStart()){
+            room.startGame();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public void exitRoom(Long roomId, SessionUser user) {
         Room room = findOne(roomId);
 
