@@ -46,7 +46,7 @@ public class Room {
         }
     }
 
-    public boolean checkOwner(User user) {
+    private boolean checkOwner(User user) {
         return owner.equals(user);
     }
 
@@ -64,9 +64,8 @@ public class Room {
     public void exit(User user) {
         if(checkOwner(user)) {
             changeOwner();
-        } else {
-            users.remove(user);
         }
+        users.remove(user);
     }
 
     public int getNumberOfUsers() {
@@ -74,16 +73,19 @@ public class Room {
     }
 
     public boolean checkStart() {
-        return this.game.checkStart(getNumberOfUsers());
+        if(game == null){
+            throw new IllegalArgumentException("게임이 정해지지 않았습니다.");
+        }
+        return this.game.checkStart();
     }
 
-    public void changeGame(Game game) {
+    public void setGame(Game game) {
         this.game = game;
     }
 
     public void startGame(){
         this.playing = true;
-        this.game.init();
+        this.game.start();
     }
 }
 
