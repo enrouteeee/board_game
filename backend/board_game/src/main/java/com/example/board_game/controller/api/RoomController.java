@@ -1,8 +1,8 @@
 package com.example.board_game.controller.api;
 
 import com.example.board_game.config.auth.dto.SessionUser;
-import com.example.board_game.dto.CreateOrUpdateRoomDto;
-import com.example.board_game.dto.GetRoomHeaderListDto;
+import com.example.board_game.dto.room.CreateOrUpdateRoomDto;
+import com.example.board_game.dto.room.GetRoomHeaderListDto;
 import com.example.board_game.service.room.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

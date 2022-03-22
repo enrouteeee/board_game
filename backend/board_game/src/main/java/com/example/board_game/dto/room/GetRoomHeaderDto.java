@@ -1,4 +1,4 @@
-package com.example.board_game.dto;
+package com.example.board_game.dto.room;
 
 import com.example.board_game.domain.room.Room;
 import lombok.AllArgsConstructor;

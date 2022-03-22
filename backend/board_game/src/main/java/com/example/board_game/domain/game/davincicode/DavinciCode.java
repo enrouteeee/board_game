@@ -11,8 +11,6 @@ public class DavinciCode extends Game {
 
     private int numberOfLivePlayers;    // 1 이면 게임 종료
 
-    private int whoTurn;
-
     public DavinciCode(Long roomId, int numberOfUsers) {
         super(roomId, numberOfUsers);
     }
@@ -24,14 +22,12 @@ public class DavinciCode extends Game {
     }
 
     @Override
-    public void start() {
+    public void start(List<Long> userIds) {
         int numberOfUsers = getNumberOfUsers();
-        for(int i=0; i<numberOfUsers; i++){
-            this.players.add(new Player(i));
+        for (Long userId : userIds) {
+            this.players.add(new Player(userId));
         }
         numberOfLivePlayers = numberOfUsers;
-
-        whoTurn = 0;
 
         board = new Board();
         board.init();
@@ -40,12 +36,12 @@ public class DavinciCode extends Game {
     /*
     플레이어가 보드에서 카드를 가져오기
      */
-    public void selectCard(int playerId, CardNumber number, CardColor color) {
+    public void selectCard(Long playerId, CardNumber number, CardColor color) {
         Card selectedCard = board.selected(number, color);
         Player player = findPlayer(playerId);
         player.addCard(selectedCard);
     }
-    public void selectCard(int playerId, CardNumber number, CardColor color, int index) {
+    public void selectCard(Long playerId, CardNumber number, CardColor color, int index) {
         Card selectedCard = board.selected(number, color);
         Player player = findPlayer(playerId);
         player.addCard(selectedCard, index);
@@ -73,7 +69,7 @@ public class DavinciCode extends Game {
     맞은 경우 턴을 이어 나갈지 종료할지 선택,
     틀린 경우 자신이 가져온 패를 뒤집고 턴을 종료
      */
-    public boolean predictCard(int playerId1, int playerId2, CardNumber expectedCard, int index) {
+    public boolean predictCard(Long playerId1, Long playerId2, CardNumber expectedCard, int index) {
         boolean flag = checkCardNumber(playerId2, expectedCard, index);
         Player player;
         if(flag) {
@@ -82,7 +78,6 @@ public class DavinciCode extends Game {
         } else {
             player = findPlayer(playerId1);
             player.flipCard(player.getLastAddedCardIndex());
-            finishTurn();
         }
 
         // 아웃된 플레이어 확인
@@ -93,29 +88,30 @@ public class DavinciCode extends Game {
         return flag;
     }
 
-    public boolean checkCardNumber(int playerId, CardNumber card, int index) {
+    public boolean checkCardNumber(Long playerId, CardNumber card, int index) {
         Player player = findPlayer(playerId);
         return player.checkCardNumber(card, index);
     }
 
-    public int getTurn(){
-        return this.whoTurn;
-    }
 
-    public void finishTurn(){
-        whoTurn = (whoTurn + 1) % getNumberOfUsers();
-        while(findPlayer(whoTurn).getState() == PlayerState.OUT) {
-            whoTurn = (whoTurn + 1) % getNumberOfUsers();
-        }
-    }
-
-
-    public Player findPlayer(int id){
+    public Player findPlayer(Long id){
         for (Player player : players) {
-            if(player.getId() == id){
+            if(player.getId().equals(id)){
                 return player;
             }
         }
         return null;
+    }
+
+    public List<Card> getCards() {
+        return board.getCards();
+    }
+
+    public List<Long> getOrder() {
+        List<Long> order = new ArrayList<>();
+        for (Player player : players) {
+            order.add(player.getId());
+        }
+        return order;
     }
 }

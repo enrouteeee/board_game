@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Player {
-    private int id;
+    private Long userId;
     private List<Card> cards = new ArrayList<>();
 
     private PlayerState state;
 
     private int lastAddedCardIndex;
 
-    public Player(int id) {
-        this.id = id;
+    public Player(Long id) {
+        this.userId = id;
         state = PlayerState.PLAYING;
     }
 
@@ -71,8 +71,8 @@ public class Player {
         return cards.get(index).getNumber().equals(cardNumber);
     }
 
-    public int getId(){
-        return this.id;
+    public Long getId(){
+        return this.userId;
     }
 
     public int getNumberOfCard() {

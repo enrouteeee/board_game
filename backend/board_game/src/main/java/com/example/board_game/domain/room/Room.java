@@ -84,8 +84,12 @@ public class Room {
     }
 
     public void startGame(){
+        List<Long> userIds = new ArrayList<>();
+        for (User user : users) {
+            userIds.add(user.getId());
+        }
         this.playing = true;
-        this.game.start();
+        this.game.start(userIds);
     }
 }
 
