@@ -19,11 +19,14 @@ public class Room {
 
     private Game game;
 
+    private boolean playing;    //게임 중인지 아닌지
+
     @Builder
     public Room(String name, int capacity, User owner) {
         this.name = name;
         this.capacity = capacity;
         this.owner = owner;
+        playing = false;
     }
 
     protected void setId(Long id) {
@@ -43,7 +46,7 @@ public class Room {
         }
     }
 
-    public boolean checkOwner(User user) {
+    private boolean checkOwner(User user) {
         return owner.equals(user);
     }
 
@@ -61,9 +64,8 @@ public class Room {
     public void exit(User user) {
         if(checkOwner(user)) {
             changeOwner();
-        } else {
-            users.remove(user);
         }
+        users.remove(user);
     }
 
     public int getNumberOfUsers() {
@@ -71,8 +73,23 @@ public class Room {
     }
 
     public boolean checkStart() {
-        // this.game.checkStart(...);
-        return true;
+        if(game == null){
+            throw new IllegalArgumentException("게임이 정해지지 않았습니다.");
+        }
+        return this.game.checkStart();
+    }
+
+    public void setGame(Game game) {
+        this.game = game;
+    }
+
+    public void startGame(){
+        List<Long> userIds = new ArrayList<>();
+        for (User user : users) {
+            userIds.add(user.getId());
+        }
+        this.playing = true;
+        this.game.start(userIds);
     }
 }
 
