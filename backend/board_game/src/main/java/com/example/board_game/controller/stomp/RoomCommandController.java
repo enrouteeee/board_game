@@ -1,7 +1,7 @@
 package com.example.board_game.controller.stomp;
 
-import com.example.board_game.config.auth.dto.SessionUser;
 import com.example.board_game.dto.room.RoomCommand;
+import com.example.board_game.dto.user.SessionUser;
 import com.example.board_game.service.room.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;

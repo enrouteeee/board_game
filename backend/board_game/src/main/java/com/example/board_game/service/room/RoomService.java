@@ -1,6 +1,5 @@
 package com.example.board_game.service.room;
 
-import com.example.board_game.config.auth.dto.SessionUser;
 import com.example.board_game.domain.game.Game;
 import com.example.board_game.domain.room.Room;
 import com.example.board_game.domain.room.RoomRepository;
@@ -9,6 +8,7 @@ import com.example.board_game.domain.user.UserRepository;
 import com.example.board_game.dto.room.CreateOrUpdateRoomDto;
 import com.example.board_game.dto.room.GetRoomHeaderDto;
 import com.example.board_game.dto.room.GetRoomHeaderListDto;
+import com.example.board_game.dto.user.SessionUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
