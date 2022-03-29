@@ -5,10 +5,18 @@ import store from './store'
 import axios from 'axios'
 
 Vue.prototype.$axios = axios
+axios.defaults.baseURL = 'http://localhost:8080'
 
 //vuetify
 import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.min.css'
+import 'material-design-icons-iconfont/dist/material-design-icons.css'
+
+export default new Vuetify({
+  icons: {
+    iconfont: 'md' // 'md' || 'mdi' || 'fa' || 'fa4'
+  }
+})
 
 Vue.use(Vuetify);
 
