@@ -15,3 +15,7 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: create-drop
+server:
+  servlet:
+    session:
+      timeout: 3600

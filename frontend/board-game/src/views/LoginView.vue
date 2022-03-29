@@ -38,11 +38,7 @@ export default {
 
       try { 
         this.$axios
-          .post("/api/login", JSON.stringify(saveData), {
-            headers: {
-              'Content-Type': 'application/json; charset = utf-8'
-            }
-          })
+          .post("/api/login", saveData, { withCredentials: true })
           .then((res) => {
             if (res.status === 200) {
               console.log('로그인 성공');
