@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 
 @RequiredArgsConstructor
-@RestController("/api/room")
+@RestController
+@RequestMapping("/api/room")
 public class RoomController {
 
     private final RoomService roomService;
