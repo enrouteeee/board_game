@@ -19,11 +19,13 @@ export default new Router({
       component: RoomList
     },
     {
-      path: '/room',
+      path: '/room/:roomId',
+      name: 'room',
       component: Room
     },
     {
-      path: '/game/davinci',
+      path: '/game/davinci/:roomId',
+      name: 'gameDavinci',
       component: GameDavinci
     }
   ]

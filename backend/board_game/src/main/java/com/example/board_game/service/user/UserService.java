@@ -44,4 +44,10 @@ public class UserService {
 
         user.updateNickname(nickname);
     }
+
+    //닉네임으로 유저 찾기
+    public User findUserByNickname(String nickname) {
+        return userRepository.findByNickname(nickname)
+                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
+    }
 }

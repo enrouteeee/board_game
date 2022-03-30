@@ -87,6 +87,7 @@ export default {
           .then((res) => {
             if (res.status === 200) {
               console.log('로그인 성공');
+              this.$store.commit('setNickname', res.data.nickname);
               this.$router.push("/room-list");
             }
           });

@@ -27,7 +27,7 @@ public class UserController {
 
     //로그인
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody LoginDto dto, HttpSession session) {
+    public ResponseEntity<SessionUser> login(@RequestBody LoginDto dto, HttpSession session) {
         SessionUser user = userService.login(dto);
 
         if(user == null){
@@ -35,7 +35,7 @@ public class UserController {
         }
         session.setAttribute("user", user);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(user);
     }
 
     //로그아웃
