@@ -1,14 +1,13 @@
 package com.example.board_game.controller.stomp;
 
+import com.example.board_game.domain.user.User;
 import com.example.board_game.dto.room.RoomCommand;
-import com.example.board_game.dto.user.SessionUser;
 import com.example.board_game.service.room.RoomService;
+import com.example.board_game.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-
-import javax.servlet.http.HttpSession;
 
 @RequiredArgsConstructor
 @Controller
@@ -16,13 +15,16 @@ public class RoomCommandController {
 
     private final SimpMessagingTemplate template;
     private final RoomService roomService;
+    private final UserService userService;
 
     @MessageMapping("/command/room")
-    public void sendCommand(RoomCommand command, HttpSession httpSession) {
-        SessionUser user = (SessionUser) httpSession.getAttribute("user");
+    public void sendCommand(RoomCommand command) {
+        System.out.println(command);
+        User user = userService.findUserByNickname(command.getSender());
 
         switch (command.getType()) {
             case ENTER:
+                System.out.println("방에 입장함");
                 roomService.joinRoom(command.getRoomId(), user);
                 command.setMessage(command.getSender()+"님이 방에 입장하셨습니다.");
                 break;
@@ -32,15 +34,17 @@ public class RoomCommandController {
                 break;
             case CHAT:
                 // 채팅 관리 로직
+                System.out.println("채팅보냄");
                 break;
             case START:
                 if(roomService.startGame(command.getRoomId())){
-                    command.setMessage("게임이 시작됩니다.");
+                    command.setMessage("게임시작");
                 } else {
-                    command.setMessage("게임을 시작할 수 없습니다.");
+                    command.setMessage("게임시작불가능");
                 }
                 break;
         }
-        template.convertAndSend("/sub/room/" + command.getRoomId(), command);
+        template.convertAndSend("/sub/command/room/" + command.getRoomId(), command);
+        System.out.println("브로드캐스트");
     }
 }

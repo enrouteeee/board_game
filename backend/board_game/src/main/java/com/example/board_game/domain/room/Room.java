@@ -1,6 +1,7 @@
 package com.example.board_game.domain.room;
 
 import com.example.board_game.domain.game.Game;
+import com.example.board_game.domain.game.davincicode.DavinciCode;
 import com.example.board_game.domain.user.User;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,7 +27,7 @@ public class Room {
         this.name = name;
         this.capacity = capacity;
         this.owner = owner;
-        playing = false;
+        this.playing = false;
     }
 
     protected void setId(Long id) {
@@ -73,9 +74,14 @@ public class Room {
     }
 
     public boolean checkStart() {
-        if(game == null){
-            throw new IllegalArgumentException("게임이 정해지지 않았습니다.");
-        }
+        /*
+        더미 데이터
+         */
+//        if(game == null){
+//            throw new IllegalArgumentException("게임이 정해지지 않았습니다.");
+//        }
+        this.game = new DavinciCode(this.id, getNumberOfUsers());
+
         return this.game.checkStart();
     }
 

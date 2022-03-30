@@ -1,7 +1,9 @@
 package com.example.board_game.controller.api;
 
 import com.example.board_game.dto.room.CreateOrUpdateRoomDto;
+import com.example.board_game.dto.room.GetRoomHeaderDto;
 import com.example.board_game.dto.room.GetRoomHeaderListDto;
+import com.example.board_game.dto.room.GetRoomInfoDto;
 import com.example.board_game.dto.user.SessionUser;
 import com.example.board_game.service.room.RoomService;
 import lombok.RequiredArgsConstructor;
@@ -18,11 +20,10 @@ public class RoomController {
     private final RoomService roomService;
 
     @PostMapping
-    public ResponseEntity createRoom(@RequestBody CreateOrUpdateRoomDto dto, HttpSession session) {
+    public ResponseEntity<GetRoomHeaderDto> createRoom(@RequestBody CreateOrUpdateRoomDto dto, HttpSession session) {
         SessionUser user = (SessionUser) session.getAttribute("user");
-        roomService.createRoom(dto, user);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(roomService.createRoom(dto, user));
     }
 
     @PutMapping("/{roomId}")
@@ -38,5 +39,11 @@ public class RoomController {
     public ResponseEntity<GetRoomHeaderListDto> rooms(){
 
         return ResponseEntity.ok(roomService.getRoomsList());
+    }
+
+    @GetMapping("/{roomId}")
+    public ResponseEntity<GetRoomInfoDto> getRoomInfo(@PathVariable("roomId") Long id) {
+
+        return ResponseEntity.ok(roomService.getRoomUsers(id));
     }
 }

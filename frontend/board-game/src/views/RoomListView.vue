@@ -46,6 +46,7 @@
         :items="roomList"
         :items-per-page="itemsPerPage"
         hide-default-footer
+        @click:row="clickRoomListRow"
         class="elevation-1">
       </v-data-table>
     </v-col>
@@ -82,7 +83,7 @@ export default {
           .post("/api/room", createRoomData, { withCredentials: true })
           .then((res) => {
             if (res.status === 200) {
-              // 방 접속
+              this.enterRoom(res.data.id);
             }
           });
       } catch (error) {
@@ -104,6 +105,18 @@ export default {
         console.log(error);
       }
     },
+    enterRoom(id) {
+      console.log(id);
+      this.$router.push({
+        name: 'room',
+        params: {
+          roomId: id,
+        }
+      });
+    },
+    clickRoomListRow(row) {
+      this.enterRoom(row.id);
+    }
   },
   created() {
     this.getRoomList()
