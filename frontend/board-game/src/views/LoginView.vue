@@ -86,8 +86,9 @@ export default {
           .post("/api/login", request, { withCredentials: true })
           .then((res) => {
             if (res.status === 200) {
-              console.log('로그인 성공');
+              console.log('로그인 성공', res.data);
               this.$store.commit('setNickname', res.data.nickname);
+              this.$store.commit('setUserId', res.data.id);
               this.$router.push("/room-list");
             }
           });

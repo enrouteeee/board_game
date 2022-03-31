@@ -2,14 +2,17 @@
   <v-container>
     <v-row>
       <v-col cols="12">
-        <h1 v-if="gameState==='INIT'">
+        <h1 v-if="gameState==='INIT' && initCount===4">
+            준비 완료
+        </h1>
+        <h1 v-else-if="gameState==='INIT'">
           카드 {{4-initCount}} 장을 선택해주세요
         </h1>
-        <h1 v-if="gameState==='READY'">
-          준비완료
+        <h1 v-if="gameState==='PLAYING_SELECT'">
+          {{turn}} 플레이어 보드판에서 카드를 선택하세요
         </h1>
-        <h1 v-if="gameState==='PLAYING'">
-          {{turn}} 플레이어 차례
+        <h1 v-if="gameState==='PLAYING_PREDICT'">
+          {{turn}} 플레이어 다른 플레이어의 카드를 예측하세요
         </h1>
         <h1 v-if="gameState==='FINISH'">
           게임이 종료되었습니다.
@@ -19,33 +22,32 @@
         <v-container>
           <v-row>
             <v-col v-for="(player, idx) in playerCards" :key="idx" cols="12">
-              
               <v-card>
                 <v-card-title>
                   플레이어 {{idx + 1}}
                 </v-card-title>
                 <v-container>
-            <v-row>
-              <v-col sm="2" v-for="(card, idx2) in player" :key="idx2">
-                <v-card dark v-if="card.color==='black'" v-bind:color="card.color">
-                  <v-card-text v-if="card.flipped">
-                    {{ card.number }}
-                  </v-card-text>
-                  <v-card-text v-else>
-                    ?
-                  </v-card-text>
-                </v-card>
-                <v-card v-else v-bind:color="card.color">
-                  <v-card-text v-if="card.flipped">
-                    {{ card.number }}
-                  </v-card-text>
-                  <v-card-text v-else>
-                    ?
-                  </v-card-text>
-                </v-card>
-              </v-col>
-            </v-row>
-          </v-container>
+                  <v-row>
+                    <v-col sm="2" v-for="(card, idx2) in player" :key="idx2">
+                      <v-card dark v-if="card.color==='black'" v-bind:color="card.color">
+                        <v-card-text v-if="card.flipped">
+                          {{ card.number }}
+                        </v-card-text>
+                        <v-card-text v-else>
+                          ?
+                        </v-card-text>
+                      </v-card>
+                      <v-card v-else v-bind:color="card.color">
+                        <v-card-text v-if="card.flipped">
+                          {{ card.number }}
+                        </v-card-text>
+                        <v-card-text v-else>
+                          ?
+                        </v-card-text>
+                      </v-card>
+                    </v-col>
+                  </v-row>
+                </v-container>
               </v-card>
 
             </v-col>
@@ -102,10 +104,11 @@ export default {
       playerCards: [],    //  각 플레이어가 가지고 있는 카드 리스트(2차원 배열)
       boardCards: [],     //  보드판의 카드 리스트
       order: [],          //  플레이어 순서
-      gameState: "INIT",  //  INIT, READY, PLAYING, FINISH
+      turn: 0,            //  현재 누구 차례인지 index of order
+      gameState: "INIT",  //  INIT, PLAYING_SELECT, PLAYING_PREDICT, FINISH
       plyerState: [],     //  각 플레이어의 상태
-      turn: 0,            //  현재 누구 차례인지
       initCount: 0,       //  게임 시작시 몇 장 가져왔는지
+
     }
   },
   created() {
@@ -125,6 +128,7 @@ export default {
             this.boardCards = res.data.board;
             var i;
             for(i =0; i<this.boardCards.length; i++){
+              this.boardCards[i].flipped = true
               switch(this.boardCards[i].color){
                 case "WHITE":
                   this.boardCards[i].color="white";
@@ -203,14 +207,65 @@ export default {
         console.log(error);
       }
     
-      if(content.type === "ENTER") {
-        console.log("ENTER");
+      if(content.type === "SELECT_CARD") {
+        console.log("SELECT_CARD");
+
+        console.log(content);
+
+        // 뽑은 사람 찾기
+        var i;
+        for(i=0; i<this.order.length; i++){
+          if(this.order[i].nickname === content.sender){
+            break;
+          }
+        }
+
+        // 보드판에서 뽑은사람한테 카드 주기
+        var selectedCard = this.boardCards[content.content];
+        this.boardCards.splice(content.content, 1);
+        this.playerCards[i].push(selectedCard);
+
+        // 게임 상태에 따른 작업
+        if(this.gameState === "INIT"){
+          console.log("ddddd")
+          console.log(this.order[i].id);
+          console.log(this.nickname);
+          console.log(this.userId);
+          if(this.order[i].id === this.userId) {
+            this.initCount++;
+          }
+          var flag = true;
+          for(var player in this.playerCards) {
+            if(player.length !== 4) {
+              flag = false;
+              break;
+            }
+          }
+          if(flag) {
+            this.gameState = "PLAYING_SELECT";
+          }
+        } else if(this.gameState === "PLAYING_SELECT") {
+          this.gameState = "PLAYING_PREDICT";
+        }
       }
     },
     selectBoardCard(idx) {
-      console.log(idx);
-      
+      console.log("카드 뽑기", idx);
+      // gameState === "INIT" 이면서 initCount 가 4 이하이거나, 내 차례에 선택할 시간 이거나
+      if((this.gameState === "INIT" && this.initCount < 4) || (this.gameState === "PLAYING_SELECT" && this.turn === this.userId)){
+        console.log("요기");
+        this.stomp.send(
+          "/pub/game",
+          JSON.stringify({
+            sender: this.nickname,
+            type:"SELECT_CARD",
+            gameId:this.gameId,
+            content:idx
+          })
+        );
+      }
     },
+
   }
 }
 </script>
