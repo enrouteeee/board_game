@@ -24,7 +24,7 @@ export default new Router({
       component: Room
     },
     {
-      path: '/game/davinci/:roomId',
+      path: '/game/davinci/:gameId',
       name: 'gameDavinci',
       component: GameDavinci
     }
