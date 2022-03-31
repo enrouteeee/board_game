@@ -96,7 +96,7 @@ import SockJS from 'sockjs-client'
 export default {
   data() {
     return {
-      userId: this.$$store.state.userId,
+      userId: this.$store.state.userId,
       nickname: this.$store.state.nickname,
       gameId: this.$route.params.gameId,
       playerCards: [],    //  각 플레이어가 가지고 있는 카드 리스트(2차원 배열)
