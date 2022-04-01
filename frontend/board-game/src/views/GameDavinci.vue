@@ -321,7 +321,7 @@ export default {
 
         // 게임 상태에 따른 작업 후속 작업
         if(this.gameState === "INIT"){
-          if(this.order[this.selectPlayer].id === this.userId) {
+          if(this.order[i].id === this.userId) {
             this.initCount++;
           }
           var flag = true;
