@@ -130,6 +130,22 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+
+      <v-dialog v-model="oneMoreModal" max-width="400">
+        <v-card>
+          <v-card-text>
+            <v-card-title>
+              예측을 계속할지 차례를 넘길지 선택하세요
+            </v-card-title>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="green darken-1" text @click=OneMorePredict>예측한다</v-btn>
+            <v-btn color="green darken-1" text @click=passTurn>넘긴다</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
     </v-row>
   </v-container>
 </template>
@@ -145,11 +161,12 @@ export default {
       nickname: this.$store.state.nickname,
       gameId: this.$route.params.gameId,
       playerCards: [],    //  각 플레이어가 가지고 있는 카드 리스트(2차원 배열)
+      
       boardCards: [],     //  보드판의 카드 리스트
       order: [],          //  플레이어 순서
       turn: 0,            //  현재 누구 차례인지 index of order : order[turn]
       gameState: "INIT",  //  INIT, PLAYING_SELECT, PLAYING_PREDICT, FINISH
-      plyerState: [],     //  각 플레이어의 상태
+      plyerState: [],     //  각 플레이어의 상태 LIVE, DIE
       initCount: 0,       //  게임 시작시 몇 장 가져왔는지
       selectPlayer: 0,  //  보드판에서 카드를 뽑은 플레이어 index : playerCards[selectPlayer]
       selectedCard: null, //  보드판에서 뽑은 카드
@@ -165,6 +182,10 @@ export default {
       predictCardIdx: 0,    // 예측한 플레이어의 카드 index
 
       predictState: "",     // 누가 누구를 에측 했는지 broadcast
+
+      playerCardsOrder: [], //  각 플레이어가 뽑은 카드의 index를 순서대로 저장한 리스트(2차원 배열) : 카드 예측에 실패시 오픈할 카드를 구하기 위해
+      
+      oneMoreModal: false,  // 카드 예측 성공시 한번 더 에측할지 차례를 넘길지 선택
     }
   },
   created() {
@@ -235,8 +256,12 @@ export default {
             }
             this.order = res.data.order;
             this.playerCards = new Array(res.data.order.length);
+            this.playerCardsOrder =  new Array(res.data.order.length);
+            this.plyerState =  new Array(res.data.order.length);
             for(i = 0; i<this.playerCards.length; i++){
               this.playerCards[i] = [];
+              this.playerCardsOrder[i] = [];
+              this.plyerState[i] = "LIVE";
             }
           }
           });
@@ -348,6 +373,7 @@ export default {
           }
         }
         this.playerCards[i].splice(content.content.position, 0, content.content.card);
+        this.playerCardsOrder[i].push(content.content.card);
 
         // 게임 상태에 따른 작업 후속 작업
         if(this.gameState === "INIT"){
@@ -372,15 +398,56 @@ export default {
         this.predictState = content.sender+"님이 "+this.order[content.content.playerIdx].nickname+"님의 "
           +(content.content.cardIdx+1)+"번째 카드를 "+content.content.number+"라고 예측했습니다.";
 
-        if(this.playerCards[content.content.playerIdx][content.content.cardIdx].number === content.content.number){
+        if(this.playerCards[content.content.playerIdx][content.content.cardIdx].number == content.content.number){
           console.log("예측 성공!");
           this.predictState += "\n예측 성공!";
-          // 차례를 넘길지, 예측을 계속할지
+          // 예측한 카드 뒤집기
+          this.playerCards[content.content.playerIdx][content.content.cardIdx].flipped = true;
+
+          if(this.order[this.turn].id === this.userId){
+            // 차례를 넘길지, 예측을 계속할지
+            this.oneMoreModal = true;
+          }
         } else {
           console.log("예측 실패!");
           this.predictState += "\n예측 실패!";
           // 자신이 마지막으로 가져온 카드를 뒤집기
+          for(i=0; i<this.order.length; i++){
+            if(this.order[i].nickname === content.sender){
+              break;
+            }
+          }
+          
+          this.playerCardsOrder[i][this.playerCardsOrder[i].length-1].flipped = true;
+
+          for(var c=1; c<this.order.length; c++){
+            if(this.plyerState[(i+c)%this.order.length] === "LIVE"){
+              this.turn = (i+c)%this.order.length;
+              break;
+            }
+          }
+          this.gameState = "PLAYING_SELECT";
         }
+      } else if (content.type === "MORE_PREDICT") {
+        console.log("MORE_PREDICT");
+
+        this.gameState = "PLAYING_PREDICT";
+      } else if (content.type === "PASS_TURN") {
+        console.log("PASS_TURN");
+
+        for(i=0; i<this.order.length; i++){
+          if(this.order[i].nickname === content.sender){
+            break;
+          }
+        }
+        
+        for(c=1; c<this.order.length; c++){
+            if(this.plyerState[(i+c)%this.order.length] === "LIVE"){
+              this.turn = (i+c)%this.order.length;
+              break;
+            }
+          }
+        this.gameState = "PLAYING_SELECT";
       }
 
     },
@@ -444,6 +511,28 @@ export default {
             cardIdx: this.predictCardIdx,
             number: this.predictIdx
           }
+        })
+      );
+    },
+    OneMorePredict() {
+      this.oneMoreModal = false;
+      this.stomp.send(
+        "/pub/game",
+        JSON.stringify({
+          sender: this.nickname,
+          type:"MORE_PREDICT",
+          gameId:this.gameId,
+        })
+      );
+    },
+    passTurn() {
+      this.oneMoreModal = false;
+      this.stomp.send(
+        "/pub/game",
+        JSON.stringify({
+          sender: this.nickname,
+          type:"PASS_TURN",
+          gameId:this.gameId,
         })
       );
     },

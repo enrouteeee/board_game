@@ -33,6 +33,12 @@ public class DavinciCodeCommandController {
             case PREDICT_CARD:
                 System.out.println("카드를 예측함");
                 break;
+            case MORE_PREDICT:
+                System.out.println("한번 더 예측함");
+                break;
+            case PASS_TURN:
+                System.out.println("차례를 넘김");
+                break;
         }
 
         template.convertAndSend("/sub/game/" + command.getGameId(), command);
