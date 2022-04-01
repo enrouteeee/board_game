@@ -30,6 +30,9 @@ public class DavinciCodeCommandController {
             case SELECT_CARD_POSITION:
                 System.out.println("카드 위치를 선택함");
                 break;
+            case PREDICT_CARD:
+                System.out.println("카드를 예측함");
+                break;
         }
 
         template.convertAndSend("/sub/game/" + command.getGameId(), command);

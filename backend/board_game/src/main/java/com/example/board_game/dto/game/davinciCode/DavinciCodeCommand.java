@@ -14,7 +14,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class DavinciCodeCommand {
     public enum DavinciCodeCommandType {
-        SELECT_CARD, SELECT_CARD_POSITION
+        SELECT_CARD, SELECT_CARD_POSITION, PREDICT_CARD
     }
 
     private String sender;

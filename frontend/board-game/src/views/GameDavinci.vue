@@ -4,7 +4,7 @@
       나가기
     </v-btn>
     <v-row>
-      <v-col cols="12">
+      <v-col cols="6">
         <h1 v-if="gameState==='INIT' && initCount===4">
             준비 완료
         </h1>
@@ -22,6 +22,9 @@
         </h1>
       </v-col>
       <v-col cols="6">
+        <h2>{{ predictState }}</h2>
+      </v-col>
+      <v-col cols="6">
         <v-container>
           <v-row>
             <v-col v-for="(player, idx) in playerCards" :key="idx" cols="12">
@@ -31,9 +34,9 @@
                 </v-card-title>
                 <v-container>
                   <v-row>
-                    <v-col sm="2" v-for="(card, idx2) in player" :key="idx2">
+                    <v-col sm="2" v-for="(card, idx2) in player" :key="idx2" @click="predictCard(idx, idx2)">
                       <v-card dark v-if="card.color==='black'" v-bind:color="card.color">
-                        <v-card-text v-if="card.flipped">
+                        <v-card-text v-if="card.flipped || order[idx].id==userId">
                           {{ card.number }}
                         </v-card-text>
                         <v-card-text v-else>
@@ -41,7 +44,7 @@
                         </v-card-text>
                       </v-card>
                       <v-card v-else v-bind:color="card.color">
-                        <v-card-text v-if="card.flipped">
+                        <v-card-text v-if="card.flipped || order[idx].id==userId">
                           {{ card.number }}
                         </v-card-text>
                         <v-card-text v-else>
@@ -107,6 +110,26 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+
+      <v-dialog v-model="predictModal" max-width="400">
+        <v-card>
+          <v-card-text>
+            <v-card-title>
+              예측할 숫자를 고르세요
+            </v-card-title>
+            <v-select
+              :items=predictItem
+              label="숫자선택"
+              required
+              v-model="predictIdx"
+            ></v-select>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="green darken-1" text @click=predictNumber>예측하기</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-row>
   </v-container>
 </template>
@@ -134,6 +157,14 @@ export default {
       selectPositionModal: false, // 여러 자리에 들어갈 경우 위치 선택 모달
       selectPositionItem: [],     // 여러 자리에 들어갈 경우 선택지
       selectedPosition: 0,        // 모달 창에서 선택한 위치
+
+      predictModal: false,  // 다른 카드를 예측하는 선택 모달
+      predictItem: [0,1,2,3,4,5,6,7,8,9,10,11,"-"],
+      predictIdx: 0,        // 예측한 숫자
+      predictPlayerIdx: 0,  // 예측한 플레이어  index
+      predictCardIdx: 0,    // 예측한 플레이어의 카드 index
+
+      predictState: "",     // 누가 누구를 에측 했는지 broadcast
     }
   },
   created() {
@@ -153,7 +184,6 @@ export default {
             this.boardCards = res.data.board;
             var i;
             for(i =0; i<this.boardCards.length; i++){
-              this.boardCards[i].flipped = true
               switch(this.boardCards[i].color){
                 case "WHITE":
                   this.boardCards[i].color="white";
@@ -336,6 +366,21 @@ export default {
         } else if(this.gameState === "PLAYING_SELECT") {
           this.gameState = "PLAYING_PREDICT";
         }
+      } else if (content.type === "PREDICT_CARD") {
+        console.log("PREDICT_CARD");
+
+        this.predictState = content.sender+"님이 "+this.order[content.content.playerIdx].nickname+"님의 "
+          +(content.content.cardIdx+1)+"번째 카드를 "+content.content.number+"라고 예측했습니다.";
+
+        if(this.playerCards[content.content.playerIdx][content.content.cardIdx].number === content.content.number){
+          console.log("예측 성공!");
+          this.predictState += "\n예측 성공!";
+          // 차례를 넘길지, 예측을 계속할지
+        } else {
+          console.log("예측 실패!");
+          this.predictState += "\n예측 실패!";
+          // 자신이 마지막으로 가져온 카드를 뒤집기
+        }
       }
 
     },
@@ -375,9 +420,36 @@ export default {
         })
       );
     },
+    predictCard(idx, idx2) {
+      console.log("카드 예측하기", idx, idx2);
+      console.log(this.gameState, "PLAYING_PREDICT", this.order[this.turn].id, this.userId, this.order[idx].id, this.userId);
+      // gameState === "PLAYING_PREDICT" 이면서 내 차례, 선택한 카드가 ? 아니어야함
+      if(this.gameState === "PLAYING_PREDICT" && this.order[this.turn].id === this.userId && this.order[idx].id != this.userId) {
+        this.predictPlayerIdx = idx;
+        this.predictCardIdx = idx2;
+        this.predictModal = true;
+      } 
+    },
+    predictNumber() {
+      this.predictModal = false;
+
+      this.stomp.send(
+        "/pub/game",
+        JSON.stringify({
+          sender: this.nickname,
+          type:"PREDICT_CARD",
+          gameId:this.gameId,
+          content: {
+            playerIdx: this.predictPlayerIdx,
+            cardIdx: this.predictCardIdx,
+            number: this.predictIdx
+          }
+        })
+      );
+    },
     exitGame() {
       this.$router.push("/room-list");
-    }
+    },
 
   }
 }
