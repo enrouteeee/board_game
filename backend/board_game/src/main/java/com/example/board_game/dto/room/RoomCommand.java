@@ -18,14 +18,4 @@ public class RoomCommand {
     private RoomCommandType type;
     private Long roomId;
     private String message;
-
-    @Override
-    public String toString() {
-        return "RoomCommand{" +
-                "sender='" + sender + '\'' +
-                ", type=" + type +
-                ", roomId=" + roomId +
-                ", message='" + message + '\'' +
-                '}';
-    }
 }

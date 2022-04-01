@@ -49,7 +49,6 @@
 <script>
 import Stomp from 'webstomp-client'
 import SockJS from 'sockjs-client'
-import router from '@/router'
 
 export default {
   data() {
@@ -91,21 +90,10 @@ export default {
       console.log(`소켓 연결을 시도합니다. 서버 주소: ${serverURL}`)
       this.stomp.connect({}, this.subRoom);
     },
-    send() {
-      if(this.stomp && this.stomp.connected) {
-        console.log("send");
-        let command = {
-          sender: this.nickname,
-          type: "CHAT",
-          roomId: this.roomId
-        }
-        this.stomp.send("/pub/command/room", JSON.stringify(command), {});
-      }
-    },
     subRoom() {
-      this.stomp.subscribe("/sub/command/room/"+this.roomId, this.subCommand);
+      this.stomp.subscribe("/sub/room/"+this.roomId, this.subCommand);
 
-      this.stomp.send("/pub/command/room", JSON.stringify({sender: this.nickname, type: "ENTER", roomId: this.roomId}), {});
+      this.stomp.send("/pub/room", JSON.stringify({sender: this.nickname, type: "ENTER", roomId: this.roomId}), {});
     },
     subCommand(command) {
       try {
@@ -130,7 +118,7 @@ export default {
           this.$router.push({
             name: 'gameDavinci',
             params: {
-            roomId: this.roomId,
+              gameId: this.roomId,
             }
           });
         } else {
@@ -139,16 +127,16 @@ export default {
       }
     },
     submitChat() {
-      this.stomp.send("/pub/command/room", JSON.stringify({sender: this.nickname, type: "CHAT", roomId: this.roomId, message: this.msg}), {});
+      this.stomp.send("/pub/room", JSON.stringify({sender: this.nickname, type: "CHAT", roomId: this.roomId, message: this.msg}), {});
       this.msg = "";
     },
     exitRoom() {
-      this.stomp.send("/pub/command/room", JSON.stringify({sender: this.nickname, type: "EXIT", roomId: this.roomId}), {});
+      this.stomp.send("/pub/room", JSON.stringify({sender: this.nickname, type: "EXIT", roomId: this.roomId}), {});
 
       this.$router.push("/room-list");
     },
     startGame() {
-      this.stomp.send("/pub/command/room", JSON.stringify({sender: this.nickname, type: "START", roomId: this.roomId}), {});
+      this.stomp.send("/pub/room", JSON.stringify({sender: this.nickname, type: "START", roomId: this.roomId}), {});
     },
   },
 }

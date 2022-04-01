@@ -1,6 +1,7 @@
 package com.example.board_game.domain.game.davincicode;
 
 import com.example.board_game.domain.game.Game;
+import com.example.board_game.domain.user.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,10 +23,10 @@ public class DavinciCode extends Game {
     }
 
     @Override
-    public void start(List<Long> userIds) {
+    public void start(List<User> users) {
         int numberOfUsers = getNumberOfUsers();
-        for (Long userId : userIds) {
-            this.players.add(new Player(userId));
+        for (User user : users) {
+            this.players.add(new Player(user));
         }
         numberOfLivePlayers = numberOfUsers;
 
@@ -107,11 +108,7 @@ public class DavinciCode extends Game {
         return board.getCards();
     }
 
-    public List<Long> getOrder() {
-        List<Long> order = new ArrayList<>();
-        for (Player player : players) {
-            order.add(player.getId());
-        }
-        return order;
+    public List<Player> getPlayers() {
+        return this.players;
     }
 }

@@ -17,7 +17,7 @@ public class RoomCommandController {
     private final RoomService roomService;
     private final UserService userService;
 
-    @MessageMapping("/command/room")
+    @MessageMapping("/room")
     public void sendCommand(RoomCommand command) {
         System.out.println(command);
         User user = userService.findUserByNickname(command.getSender());
@@ -44,7 +44,7 @@ public class RoomCommandController {
                 }
                 break;
         }
-        template.convertAndSend("/sub/command/room/" + command.getRoomId(), command);
+        template.convertAndSend("/sub/room/" + command.getRoomId(), command);
         System.out.println("브로드캐스트");
     }
 }

@@ -14,6 +14,9 @@ export default new Vuex.Store({
   mutations: {
     setNickname: function(state, payload) {
       return state.nickname = payload;
+    },
+    setUserId: function(state, payload) {
+      return state.userId = payload;
     }
   },
   action: {
