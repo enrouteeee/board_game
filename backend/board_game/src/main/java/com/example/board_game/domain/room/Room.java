@@ -80,7 +80,7 @@ public class Room {
 //        if(game == null){
 //            throw new IllegalArgumentException("게임이 정해지지 않았습니다.");
 //        }
-        this.game = new DavinciCode(this.id, getNumberOfUsers());
+        setGame(new DavinciCode(this.id, getNumberOfUsers()));
 
         return this.game.checkStart();
     }
@@ -90,12 +90,8 @@ public class Room {
     }
 
     public void startGame(){
-        List<Long> userIds = new ArrayList<>();
-        for (User user : users) {
-            userIds.add(user.getId());
-        }
         this.playing = true;
-        this.game.start(userIds);
+        this.game.start(users);
     }
 }
 

@@ -1,11 +1,11 @@
 package com.example.board_game.domain.game.davincicode;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Vector;
 
 public class Board {
-    private List<Card> cards = new ArrayList<>();
+    private List<Card> cards = new Vector<>();
 
     public void init() {
         CardNumber[] cardNumbers = CardNumber.values();

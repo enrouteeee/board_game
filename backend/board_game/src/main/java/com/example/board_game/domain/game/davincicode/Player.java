@@ -1,18 +1,24 @@
 package com.example.board_game.domain.game.davincicode;
 
+import com.example.board_game.domain.user.User;
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 public class Player {
     private Long userId;
+    private String nickname;
     private List<Card> cards = new ArrayList<>();
 
     private PlayerState state;
 
     private int lastAddedCardIndex;
 
-    public Player(Long id) {
-        this.userId = id;
+    public Player(User user) {
+        this.userId = user.getId();
+        this.nickname = user.getNickname();
         state = PlayerState.PLAYING;
     }
 
@@ -98,9 +104,5 @@ public class Player {
             }
         }
         return true;
-    }
-
-    public PlayerState getState() {
-        return state;
     }
 }

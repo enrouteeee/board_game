@@ -45,7 +45,6 @@
         :headers="headers"
         :items="roomList"
         :items-per-page="itemsPerPage"
-        hide-default-footer
         @click:row="clickRoomListRow"
         class="elevation-1">
       </v-data-table>
