@@ -3,6 +3,9 @@
     <v-btn @click="exitGame">
       나가기
     </v-btn>
+    <v-btn v-if="gameState === 'FINISH'" @click="returnToRoom">
+      방으로 돌아가기
+    </v-btn>
     <v-row>
       <v-col cols="6">
         <h1 v-if="gameState==='INIT' && initCount===4">
@@ -18,7 +21,7 @@
           {{order[turn].nickname}} 님 다른 플레이어의 카드를 예측하세요
         </h1>
         <h1 v-if="gameState==='FINISH'">
-          게임이 종료되었습니다.
+          게임이 종료되었습니다. 승자는 {{victoryNickname}} 님 입니다.
         </h1>
       </v-col>
       <v-col cols="6">
@@ -166,7 +169,7 @@ export default {
       order: [],          //  플레이어 순서
       turn: 0,            //  현재 누구 차례인지 index of order : order[turn]
       gameState: "INIT",  //  INIT, PLAYING_SELECT, PLAYING_PREDICT, FINISH
-      plyerState: [],     //  각 플레이어의 상태 LIVE, DIE
+      plyerState: [],     //  각 플레이어의 상태 ALIVE, DIE
       initCount: 0,       //  게임 시작시 몇 장 가져왔는지
       selectPlayer: 0,  //  보드판에서 카드를 뽑은 플레이어 index : playerCards[selectPlayer]
       selectedCard: null, //  보드판에서 뽑은 카드
@@ -186,6 +189,8 @@ export default {
       playerCardsOrder: [], //  각 플레이어가 뽑은 카드의 index를 순서대로 저장한 리스트(2차원 배열) : 카드 예측에 실패시 오픈할 카드를 구하기 위해
       
       oneMoreModal: false,  // 카드 예측 성공시 한번 더 에측할지 차례를 넘길지 선택
+
+      victoryNickname: ""   // 이긴사람 닉네임
     }
   },
   created() {
@@ -261,7 +266,7 @@ export default {
             for(i = 0; i<this.playerCards.length; i++){
               this.playerCards[i] = [];
               this.playerCardsOrder[i] = [];
-              this.plyerState[i] = "LIVE";
+              this.plyerState[i] = "ALIVE";
             }
           }
           });
@@ -402,7 +407,10 @@ export default {
           console.log("예측 성공!");
           this.predictState += "\n예측 성공!";
           // 예측한 카드 뒤집기
-          this.playerCards[content.content.playerIdx][content.content.cardIdx].flipped = true;
+          // this.playerCards[content.content.playerIdx][content.content.cardIdx].flipped = true;
+          if(this.cardFlip(content.content.playerIdx, content.content.cardIdx)){
+            return;
+          }
 
           if(this.order[this.turn].id === this.userId){
             // 차례를 넘길지, 예측을 계속할지
@@ -418,10 +426,13 @@ export default {
             }
           }
           
-          this.playerCardsOrder[i][this.playerCardsOrder[i].length-1].flipped = true;
+          // this.playerCardsOrder[i][this.playerCardsOrder[i].length-1].flipped = true;
+          if(this.cardFlip(i, this.playerCardsOrder[i].length-1)){
+            return;
+          }
 
           for(var c=1; c<this.order.length; c++){
-            if(this.plyerState[(i+c)%this.order.length] === "LIVE"){
+            if(this.plyerState[(i+c)%this.order.length] === "ALIVE"){
               this.turn = (i+c)%this.order.length;
               break;
             }
@@ -442,7 +453,7 @@ export default {
         }
         
         for(c=1; c<this.order.length; c++){
-            if(this.plyerState[(i+c)%this.order.length] === "LIVE"){
+            if(this.plyerState[(i+c)%this.order.length] === "ALIVE"){
               this.turn = (i+c)%this.order.length;
               break;
             }
@@ -536,10 +547,55 @@ export default {
         })
       );
     },
+    cardFlip(playerIdx, cardIdx) {
+      // 게임 끝났으면 return true, 게임 안끝났으면 return fasle
+
+      this.playerCards[playerIdx][cardIdx].flipped = true;
+
+      var flag = true; // 뒤집한 플레이어 상태 확인 true : die, false : alive
+      for(var i=0; i<this.playerCards[playerIdx].length; i++){
+        if(this.playerCards[playerIdx][i].flipped === false){
+          flag = false;
+          break;
+        }
+      }
+      if(flag) {
+        this.plyerState[playerIdx] = "DIE";
+
+        var cnt = 0;
+        for(i=0; i<this.plyerState.length; i++) {
+          if(this.plyerState[i] === "DIE"){
+            cnt++;
+          }
+        }
+
+        if(cnt === this.plyerState.length-1){
+          // 게임 끝
+          console.log("게임끝");
+
+          //게임 끝 로직
+          this.finishGame();
+          return true;
+        }
+      }
+
+      return false;
+    },
+    finishGame() {
+      this.gameState = "FINISH";
+    },
+    returnToRoom() {
+      this.$router.push({
+        name: 'room',
+        params: {
+          roomId: this.gameId,
+        }
+      });
+    },
     exitGame() {
       this.$router.push("/room-list");
     },
-
+  
   }
 }
 </script>
