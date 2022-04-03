@@ -94,7 +94,7 @@
         </v-card>
       </v-col>
       
-      <v-dialog v-model="selectPositionModal" max-width="400">
+      <v-dialog v-model="selectPositionModal" max-width="400" persistent>
         <v-card>
           <v-card-title>
             {{ selectedCardNumber }} 카드를 뽑았습니다.
@@ -137,7 +137,7 @@
         </v-card>
       </v-dialog>
 
-      <v-dialog v-model="oneMoreModal" max-width="400">
+      <v-dialog v-model="oneMoreModal" max-width="400" persistent>
         <v-card>
           <v-card-text>
             <v-card-title>
