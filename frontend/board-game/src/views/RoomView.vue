@@ -92,8 +92,7 @@ export default {
     },
     subRoom() {
       this.stomp.subscribe("/sub/room/"+this.roomId, this.subCommand);
-
-      this.stomp.send("/pub/room", JSON.stringify({sender: this.nickname, type: "ENTER", roomId: this.roomId}), {});
+      this.enterRoom();
     },
     subCommand(command) {
       try {
@@ -104,7 +103,6 @@ export default {
       
       if(content.type === "ENTER") {
         console.log("ENTER");
-        // this.userList.push(content.sender);
         this.getRoomInfo();
       } else if(content.type === "CHAT") {
         console.log("CHAT");
@@ -124,6 +122,11 @@ export default {
         } else {
           console.log("시작불가능");
         }
+      }
+    },
+    enterRoom() {
+      if(!this.userList.includes(this.nickname)){
+        this.stomp.send("/pub/room", JSON.stringify({sender: this.nickname, type: "ENTER", roomId: this.roomId}), {});
       }
     },
     submitChat() {
