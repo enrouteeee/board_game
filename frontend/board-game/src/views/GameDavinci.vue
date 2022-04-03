@@ -587,6 +587,8 @@ export default {
         for(i=0; i<this.plyerState.length; i++) {
           if(this.plyerState[i] === "DIE"){
             cnt++;
+          } else if(this.plyerState[i] == "ALIVE") {
+            this.victoryNickname = this.order[i].nickname;
           }
         }
 
