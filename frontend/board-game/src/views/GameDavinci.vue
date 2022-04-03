@@ -34,6 +34,7 @@
               <v-card>
                 <v-card-title>
                   {{order[idx].nickname}}
+                  <span v-if="playerState[idx]==='DIE'"> 죽음</span>
                 </v-card-title>
                 <v-container>
                   <v-row>
@@ -94,12 +95,15 @@
         </v-card>
       </v-col>
       
-      <v-dialog v-model="selectPositionModal" max-width="400">
+      <v-dialog v-model="selectPositionModal" max-width="400" persistent>
         <v-card>
+          <v-card-title>
+            {{ selectedCardNumber }} 카드를 뽑았습니다.
+          </v-card-title>
+          <v-card-subtitle>
+            몇 번째 위치에 놓을지 선택하세요.
+          </v-card-subtitle>
           <v-card-text>
-            <v-card-title>
-              카드가 들어갈 위치를 선택해주세요
-            </v-card-title>
             <v-select
               :items=selectPositionItem
               label="위치선택"
@@ -134,7 +138,7 @@
         </v-card>
       </v-dialog>
 
-      <v-dialog v-model="oneMoreModal" max-width="400">
+      <v-dialog v-model="oneMoreModal" max-width="400" persistent>
         <v-card>
           <v-card-text>
             <v-card-title>
@@ -144,7 +148,7 @@
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="green darken-1" text @click=OneMorePredict>예측한다</v-btn>
-            <v-btn color="green darken-1" text @click=passTurn>넘긴다</v-btn>
+            <v-btn color="green darken-1" text @click=passTurnClick>넘긴다</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -169,10 +173,11 @@ export default {
       order: [],          //  플레이어 순서
       turn: 0,            //  현재 누구 차례인지 index of order : order[turn]
       gameState: "INIT",  //  INIT, PLAYING_SELECT, PLAYING_PREDICT, FINISH
-      plyerState: [],     //  각 플레이어의 상태 ALIVE, DIE
+      playerState: [],     //  각 플레이어의 상태 ALIVE, DIE
       initCount: 0,       //  게임 시작시 몇 장 가져왔는지
       selectPlayer: 0,  //  보드판에서 카드를 뽑은 플레이어 index : playerCards[selectPlayer]
       selectedCard: null, //  보드판에서 뽑은 카드
+      selectedCardNumber: 0,  // 보드판에서 뽑은 카드 숫자 selectPositionModal 에서 사용
 
       selectPositionModal: false, // 여러 자리에 들어갈 경우 위치 선택 모달
       selectPositionItem: [],     // 여러 자리에 들어갈 경우 선택지
@@ -262,11 +267,11 @@ export default {
             this.order = res.data.order;
             this.playerCards = new Array(res.data.order.length);
             this.playerCardsOrder =  new Array(res.data.order.length);
-            this.plyerState =  new Array(res.data.order.length);
+            this.playerState =  new Array(res.data.order.length);
             for(i = 0; i<this.playerCards.length; i++){
               this.playerCards[i] = [];
               this.playerCardsOrder[i] = [];
-              this.plyerState[i] = "ALIVE";
+              this.playerState[i] = "ALIVE";
             }
           }
           });
@@ -366,6 +371,7 @@ export default {
           this.selectedPosition = ablePosition[0];
           this.cardSeletedEvent();
         } else {
+          this.selectedCardNumber = this.selectedCard.number
           this.selectPositionItem = ablePosition;
           this.selectPositionModal = true;
         }
@@ -407,7 +413,6 @@ export default {
           console.log("예측 성공!");
           this.predictState += "\n예측 성공!";
           // 예측한 카드 뒤집기
-          // this.playerCards[content.content.playerIdx][content.content.cardIdx].flipped = true;
           if(this.cardFlip(content.content.playerIdx, content.content.cardIdx)){
             return;
           }
@@ -426,23 +431,27 @@ export default {
             }
           }
           
-          // this.playerCardsOrder[i][this.playerCardsOrder[i].length-1].flipped = true;
-          if(this.cardFlip(i, this.playerCardsOrder[i].length-1)){
-            return;
-          }
-
-          for(var c=1; c<this.order.length; c++){
-            if(this.plyerState[(i+c)%this.order.length] === "ALIVE"){
-              this.turn = (i+c)%this.order.length;
+          // 예측실패 시 뒤집을 카드 찾기
+          var num;
+          for(var c=this.playerCardsOrder[i].length-1; c>=0; c--){
+            if(this.playerCardsOrder[i][c].flipped === false){
+              num = this.playerCardsOrder[i][c].number;
               break;
             }
           }
-          this.gameState = "PLAYING_SELECT";
-        }
-      } else if (content.type === "MORE_PREDICT") {
-        console.log("MORE_PREDICT");
+          for(c=0; c<this.playerCards[i].length; c++){
+            if(num === this.playerCards[i][c].number){
+              break;
+            }
+          }
 
-        this.gameState = "PLAYING_PREDICT";
+          if(this.cardFlip(i, c)){
+            return;
+          }
+
+          // 턴 넘기기
+          this.passTurn();
+        }
       } else if (content.type === "PASS_TURN") {
         console.log("PASS_TURN");
 
@@ -452,13 +461,8 @@ export default {
           }
         }
         
-        for(c=1; c<this.order.length; c++){
-            if(this.plyerState[(i+c)%this.order.length] === "ALIVE"){
-              this.turn = (i+c)%this.order.length;
-              break;
-            }
-          }
-        this.gameState = "PLAYING_SELECT";
+        //턴 넘기기
+        this.passTurn();
       }
 
     },
@@ -500,9 +504,11 @@ export default {
     },
     predictCard(idx, idx2) {
       console.log("카드 예측하기", idx, idx2);
-      console.log(this.gameState, "PLAYING_PREDICT", this.order[this.turn].id, this.userId, this.order[idx].id, this.userId);
-      // gameState === "PLAYING_PREDICT" 이면서 내 차례, 선택한 카드가 ? 아니어야함
-      if(this.gameState === "PLAYING_PREDICT" && this.order[this.turn].id === this.userId && this.order[idx].id != this.userId) {
+      // gameState === "PLAYING_PREDICT", 내 차례이어야 함, 내 카드가 아니어야 함, 선택한 카드가 '?'카드 아니어야함
+      if(this.gameState === "PLAYING_PREDICT"
+        && this.order[this.turn].id === this.userId && this.order[idx].id != this.userId
+        && this.playerCards[idx][idx2].flipped == false) {
+
         this.predictPlayerIdx = idx;
         this.predictCardIdx = idx2;
         this.predictModal = true;
@@ -525,18 +531,25 @@ export default {
         })
       );
     },
+    passTurn() {
+      // 살아있는 사람 찾아서 턴 넘기기
+      for(var c=1; c<this.order.length; c++){
+        if(this.playerState[(this.turn+c)%this.order.length] === "ALIVE"){
+          this.turn = (this.turn+c)%this.order.length;
+          break;
+        }
+      }
+      // 보드판에 카드가 있으면 PLAYING_SELECT, 없으면 PLAYING_PREDICT
+      if(this.boardCards.length === 0){
+        this.gameState = "PLAYING_PREDICT";
+      } else {
+        this.gameState = "PLAYING_SELECT";
+      }
+    },
     OneMorePredict() {
       this.oneMoreModal = false;
-      this.stomp.send(
-        "/pub/game",
-        JSON.stringify({
-          sender: this.nickname,
-          type:"MORE_PREDICT",
-          gameId:this.gameId,
-        })
-      );
     },
-    passTurn() {
+    passTurnClick() {
       this.oneMoreModal = false;
       this.stomp.send(
         "/pub/game",
@@ -560,16 +573,18 @@ export default {
         }
       }
       if(flag) {
-        this.plyerState[playerIdx] = "DIE";
+        this.playerState[playerIdx] = "DIE";
 
         var cnt = 0;
-        for(i=0; i<this.plyerState.length; i++) {
-          if(this.plyerState[i] === "DIE"){
+        for(i=0; i<this.playerState.length; i++) {
+          if(this.playerState[i] === "DIE"){
             cnt++;
+          } else if(this.playerState[i] == "ALIVE") {
+            this.victoryNickname = this.order[i].nickname;
           }
         }
 
-        if(cnt === this.plyerState.length-1){
+        if(cnt === this.playerState.length-1){
           // 게임 끝
           console.log("게임끝");
 
@@ -585,12 +600,7 @@ export default {
       this.gameState = "FINISH";
     },
     returnToRoom() {
-      this.$router.push({
-        name: 'room',
-        params: {
-          roomId: this.gameId,
-        }
-      });
+      this.$router.go(-1);
     },
     exitGame() {
       this.$router.push("/room-list");
