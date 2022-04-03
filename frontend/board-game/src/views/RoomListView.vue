@@ -67,8 +67,8 @@ export default {
         { text: '현재인원', align: 'center', sortable: false, value: 'numberOfUsers'},
       ],
       dialog: false,
-      createRoomName: "",
-      createRoomCapacity: "",
+      createRoomName: null,
+      createRoomCapacity: 2,
     };
   },
   methods: {
@@ -106,12 +106,27 @@ export default {
     },
     enterRoom(id) {
       console.log(id);
-      this.$router.push({
-        name: 'room',
-        params: {
-          roomId: id,
-        }
-      });
+
+      try { 
+        this.$axios
+          .get("/api/room/"+id+"/enter")
+          .then((res) => {
+            if (res.status === 200) {
+              if(res.data) {
+                this.$router.push({
+                  name: 'room',
+                  params: {
+                  roomId: id,
+                  }
+                });
+              } else {
+                console.log("방에 못 들어감");
+              }
+            }
+          });
+      } catch (error) {
+        console.log(error);
+      }
     },
     clickRoomListRow(row) {
       this.enterRoom(row.id);
