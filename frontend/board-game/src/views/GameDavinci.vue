@@ -431,12 +431,26 @@ export default {
             }
           }
           
-          // this.playerCardsOrder[i][this.playerCardsOrder[i].length-1].flipped = true;
-          if(this.cardFlip(i, this.playerCardsOrder[i].length-1)){
+          // 예측실패 시 뒤집을 카드 찾기
+          var num;
+          for(var c=this.playerCardsOrder[i].length-1; c>=0; c--){
+            if(this.playerCardsOrder[i][c].flipped === false){
+              num = this.playerCardsOrder[i][c].number;
+              break;
+            }
+          }
+          for(c=0; c<this.playerCards[i].length; c++){
+            if(num === this.playerCards[i][c].number){
+              break;
+            }
+          }
+
+          if(this.cardFlip(i, c)){
             return;
           }
 
-          for(var c=1; c<this.order.length; c++){
+          // 턴 넘기기
+          for(c=1; c<this.order.length; c++){
             if(this.plyerState[(i+c)%this.order.length] === "ALIVE"){
               this.turn = (i+c)%this.order.length;
               break;
