@@ -600,12 +600,7 @@ export default {
       this.gameState = "FINISH";
     },
     returnToRoom() {
-      this.$router.push({
-        name: 'room',
-        params: {
-          roomId: this.gameId,
-        }
-      });
+      this.$router.go(-1);
     },
     exitGame() {
       this.$router.push("/room-list");
