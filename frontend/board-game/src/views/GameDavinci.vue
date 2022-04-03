@@ -147,7 +147,7 @@
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="green darken-1" text @click=OneMorePredict>예측한다</v-btn>
-            <v-btn color="green darken-1" text @click=passTurn>넘긴다</v-btn>
+            <v-btn color="green darken-1" text @click=passTurnClick>넘긴다</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -412,7 +412,6 @@ export default {
           console.log("예측 성공!");
           this.predictState += "\n예측 성공!";
           // 예측한 카드 뒤집기
-          // this.playerCards[content.content.playerIdx][content.content.cardIdx].flipped = true;
           if(this.cardFlip(content.content.playerIdx, content.content.cardIdx)){
             return;
           }
@@ -450,13 +449,7 @@ export default {
           }
 
           // 턴 넘기기
-          for(c=1; c<this.order.length; c++){
-            if(this.plyerState[(i+c)%this.order.length] === "ALIVE"){
-              this.turn = (i+c)%this.order.length;
-              break;
-            }
-          }
-          this.gameState = "PLAYING_SELECT";
+          this.passTurn();
         }
       } else if (content.type === "MORE_PREDICT") {
         console.log("MORE_PREDICT");
@@ -471,13 +464,8 @@ export default {
           }
         }
         
-        for(c=1; c<this.order.length; c++){
-            if(this.plyerState[(i+c)%this.order.length] === "ALIVE"){
-              this.turn = (i+c)%this.order.length;
-              break;
-            }
-          }
-        this.gameState = "PLAYING_SELECT";
+        //턴 넘기기
+        this.passTurn();
       }
 
     },
@@ -546,6 +534,21 @@ export default {
         })
       );
     },
+    passTurn() {
+      // 살아있는 사람 찾아서 턴 넘기기
+      for(var c=1; c<this.order.length; c++){
+        if(this.plyerState[(this.turn+c)%this.order.length] === "ALIVE"){
+          this.turn = (this.turn+c)%this.order.length;
+          break;
+        }
+      }
+      // 보드판에 카드가 있으면 PLAYING_SELECT, 없으면 PLAYING_PREDICT
+      if(this.boardCards.length === 0){
+        this.gameState = "PLAYING_PREDICT";
+      } else {
+        this.gameState = "PLAYING_SELECT";
+      }
+    },
     OneMorePredict() {
       this.oneMoreModal = false;
       this.stomp.send(
@@ -557,7 +560,7 @@ export default {
         })
       );
     },
-    passTurn() {
+    passTurnClick() {
       this.oneMoreModal = false;
       this.stomp.send(
         "/pub/game",
