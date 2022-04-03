@@ -26,17 +26,8 @@ public class RoomController {
         return ResponseEntity.ok(roomService.createRoom(dto, user));
     }
 
-    @PutMapping("/{roomId}")
-    public ResponseEntity updateRoom(@RequestBody CreateOrUpdateRoomDto dto, @PathVariable("roomId") Long id,
-                                             HttpSession session) {
-        SessionUser user = (SessionUser) session.getAttribute("user");
-        roomService.updateRoom(dto, id, user);
-
-        return ResponseEntity.ok().build();
-    }
-
     @GetMapping
-    public ResponseEntity<GetRoomHeaderListDto> rooms(){
+    public ResponseEntity<GetRoomHeaderListDto> getRooms(){
 
         return ResponseEntity.ok(roomService.getRoomsList());
     }
@@ -46,4 +37,11 @@ public class RoomController {
 
         return ResponseEntity.ok(roomService.getRoomUsers(id));
     }
+
+    @GetMapping("/{roomId}/enter")
+    public ResponseEntity<Boolean> checkAbleToEnter(@PathVariable("roomId") long id) {
+
+        return ResponseEntity.ok(roomService.checkAbleToEnter(id));
+    }
+
 }

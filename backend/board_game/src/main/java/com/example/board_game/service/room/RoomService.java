@@ -31,15 +31,6 @@ public class RoomService {
         return new GetRoomHeaderDto(roomRepository.save(room));
     }
 
-    public void updateRoom(CreateOrUpdateRoomDto dto, Long id, SessionUser user) {
-        Room room = findOne(id);
-
-        User findUser = userRepository.findByEmail(user.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
-
-        room.updateRoomInfo(dto.getName(), dto.getCapacity(), findUser);
-    }
-
     public GetRoomHeaderListDto getRoomsList() {
         List<Room> all = roomRepository.findAll();
         List<GetRoomHeaderDto> list = new ArrayList<>();
@@ -56,6 +47,12 @@ public class RoomService {
         Room room = findOne(roomId);
 
         return new GetRoomInfoDto(room.getName(), room.getUsers());
+    }
+
+    public boolean checkAbleToEnter(Long roomId) {
+        Room room = findOne(roomId);
+
+        return room.isAbleToEnter();
     }
 
     public void joinRoom(Long roomId, User user) {

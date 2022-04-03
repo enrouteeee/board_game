@@ -93,5 +93,12 @@ public class Room {
         this.playing = true;
         this.game.start(users);
     }
+
+    public boolean isAbleToEnter() {
+        if(this.playing || this.capacity <= getNumberOfUsers()){
+            return false;
+        }
+        return true;
+    }
 }
 
