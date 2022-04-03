@@ -505,9 +505,11 @@ export default {
     },
     predictCard(idx, idx2) {
       console.log("카드 예측하기", idx, idx2);
-      console.log(this.gameState, "PLAYING_PREDICT", this.order[this.turn].id, this.userId, this.order[idx].id, this.userId);
-      // gameState === "PLAYING_PREDICT" 이면서 내 차례, 선택한 카드가 ? 아니어야함
-      if(this.gameState === "PLAYING_PREDICT" && this.order[this.turn].id === this.userId && this.order[idx].id != this.userId) {
+      // gameState === "PLAYING_PREDICT", 내 차례이어야 함, 내 카드가 아니어야 함, 선택한 카드가 '?'카드 아니어야함
+      if(this.gameState === "PLAYING_PREDICT"
+        && this.order[this.turn].id === this.userId && this.order[idx].id != this.userId
+        && this.playerCards[idx][idx2].flipped == false) {
+
         this.predictPlayerIdx = idx;
         this.predictCardIdx = idx2;
         this.predictModal = true;
