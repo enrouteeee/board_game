@@ -42,7 +42,11 @@
                   <v-row>
                     <v-col sm="2" v-for="(card, idx2) in player" :key="idx2" @click="predictCard(idx, idx2)">
                       <v-card dark v-if="card.color==='black'" v-bind:color="card.color">
-                        <v-card-text v-if="card.flipped || order[idx].id==userId">
+                        <v-card-text v-if="order[idx].id==userId">
+                          {{ card.number }}
+                          <div v-if="card.flipped">들킴</div>
+                        </v-card-text>
+                        <v-card-text v-else-if="card.flipped">
                           {{ card.number }}
                         </v-card-text>
                         <v-card-text v-else>
@@ -50,7 +54,11 @@
                         </v-card-text>
                       </v-card>
                       <v-card v-else v-bind:color="card.color">
-                        <v-card-text v-if="card.flipped || order[idx].id==userId">
+                        <v-card-text v-if="order[idx].id==userId">
+                          {{ card.number }}
+                          <div v-if="card.flipped">들킴</div>
+                        </v-card-text>
+                        <v-card-text v-else-if="card.flipped">
                           {{ card.number }}
                         </v-card-text>
                         <v-card-text v-else>
@@ -629,6 +637,7 @@ export default {
       );
     },
     returnToRoom() {
+      this.stomp.disconnect();
       this.$router.go(-1);
     },
     exitGame() {
@@ -640,6 +649,9 @@ export default {
           gameId:this.gameId,
         })
       );
+      if(this.stomp){
+        this.stomp.disconnect();
+      }
       this.$router.push("/room-list");
     },
   
