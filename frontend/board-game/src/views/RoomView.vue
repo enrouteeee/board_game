@@ -20,11 +20,16 @@
       
         <v-col cols="12">
           <v-card>
-            <div style="height:400px;">
-          <div v-for="(item, idx) in chatList" :key="idx">
-            <div>{{ item }}</div>
-          </div>
-          </div>
+            <v-container
+              id="scroll-target"
+              style="max-height: 400px"
+              class="overflow-y-auto">
+              <v-row align-content="start" v-scroll:#scroll-target="onScroll" style="height: 400px">
+                <v-col cols="12" v-for="(item, idx) in chatList" :key="idx">
+                  {{ item }}
+                </v-col>
+              </v-row>
+            </v-container>
           </v-card>
         </v-col>
 
