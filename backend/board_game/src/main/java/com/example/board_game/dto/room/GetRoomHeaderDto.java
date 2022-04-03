@@ -15,11 +15,13 @@ public class GetRoomHeaderDto {
     private String name;
     private int capacity;
     private int numberOfUsers;
+    private String state;
 
     public GetRoomHeaderDto(Room room) {
         this.id = room.getId();
         this.name = room.getName();
         this.capacity = room.getCapacity();
         this.numberOfUsers = room.getNumberOfUsers();
+        this.state = room.isPlaying() ? "게임중" : "모집중";
     }
 }
