@@ -96,10 +96,13 @@
       
       <v-dialog v-model="selectPositionModal" max-width="400">
         <v-card>
+          <v-card-title>
+            {{ selectedCardNumber }} 카드를 뽑았습니다.
+          </v-card-title>
+          <v-card-subtitle>
+            몇 번째 위치에 놓을지 선택하세요.
+          </v-card-subtitle>
           <v-card-text>
-            <v-card-title>
-              카드가 들어갈 위치를 선택해주세요
-            </v-card-title>
             <v-select
               :items=selectPositionItem
               label="위치선택"
@@ -173,6 +176,7 @@ export default {
       initCount: 0,       //  게임 시작시 몇 장 가져왔는지
       selectPlayer: 0,  //  보드판에서 카드를 뽑은 플레이어 index : playerCards[selectPlayer]
       selectedCard: null, //  보드판에서 뽑은 카드
+      selectedCardNumber: 0,  // 보드판에서 뽑은 카드 숫자 selectPositionModal 에서 사용
 
       selectPositionModal: false, // 여러 자리에 들어갈 경우 위치 선택 모달
       selectPositionItem: [],     // 여러 자리에 들어갈 경우 선택지
@@ -366,6 +370,7 @@ export default {
           this.selectedPosition = ablePosition[0];
           this.cardSeletedEvent();
         } else {
+          this.selectedCardNumber = this.selectedCard.number
           this.selectPositionItem = ablePosition;
           this.selectPositionModal = true;
         }
