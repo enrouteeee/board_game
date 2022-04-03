@@ -34,6 +34,7 @@
               <v-card>
                 <v-card-title>
                   {{order[idx].nickname}}
+                  <span v-if="playerState[idx]==='DIE'"> 죽음</span>
                 </v-card-title>
                 <v-container>
                   <v-row>
@@ -172,7 +173,7 @@ export default {
       order: [],          //  플레이어 순서
       turn: 0,            //  현재 누구 차례인지 index of order : order[turn]
       gameState: "INIT",  //  INIT, PLAYING_SELECT, PLAYING_PREDICT, FINISH
-      plyerState: [],     //  각 플레이어의 상태 ALIVE, DIE
+      playerState: [],     //  각 플레이어의 상태 ALIVE, DIE
       initCount: 0,       //  게임 시작시 몇 장 가져왔는지
       selectPlayer: 0,  //  보드판에서 카드를 뽑은 플레이어 index : playerCards[selectPlayer]
       selectedCard: null, //  보드판에서 뽑은 카드
@@ -266,11 +267,11 @@ export default {
             this.order = res.data.order;
             this.playerCards = new Array(res.data.order.length);
             this.playerCardsOrder =  new Array(res.data.order.length);
-            this.plyerState =  new Array(res.data.order.length);
+            this.playerState =  new Array(res.data.order.length);
             for(i = 0; i<this.playerCards.length; i++){
               this.playerCards[i] = [];
               this.playerCardsOrder[i] = [];
-              this.plyerState[i] = "ALIVE";
+              this.playerState[i] = "ALIVE";
             }
           }
           });
@@ -451,10 +452,6 @@ export default {
           // 턴 넘기기
           this.passTurn();
         }
-      } else if (content.type === "MORE_PREDICT") {
-        console.log("MORE_PREDICT");
-
-        this.gameState = "PLAYING_PREDICT";
       } else if (content.type === "PASS_TURN") {
         console.log("PASS_TURN");
 
@@ -537,7 +534,7 @@ export default {
     passTurn() {
       // 살아있는 사람 찾아서 턴 넘기기
       for(var c=1; c<this.order.length; c++){
-        if(this.plyerState[(this.turn+c)%this.order.length] === "ALIVE"){
+        if(this.playerState[(this.turn+c)%this.order.length] === "ALIVE"){
           this.turn = (this.turn+c)%this.order.length;
           break;
         }
@@ -551,14 +548,6 @@ export default {
     },
     OneMorePredict() {
       this.oneMoreModal = false;
-      this.stomp.send(
-        "/pub/game",
-        JSON.stringify({
-          sender: this.nickname,
-          type:"MORE_PREDICT",
-          gameId:this.gameId,
-        })
-      );
     },
     passTurnClick() {
       this.oneMoreModal = false;
@@ -584,18 +573,18 @@ export default {
         }
       }
       if(flag) {
-        this.plyerState[playerIdx] = "DIE";
+        this.playerState[playerIdx] = "DIE";
 
         var cnt = 0;
-        for(i=0; i<this.plyerState.length; i++) {
-          if(this.plyerState[i] === "DIE"){
+        for(i=0; i<this.playerState.length; i++) {
+          if(this.playerState[i] === "DIE"){
             cnt++;
-          } else if(this.plyerState[i] == "ALIVE") {
+          } else if(this.playerState[i] == "ALIVE") {
             this.victoryNickname = this.order[i].nickname;
           }
         }
 
-        if(cnt === this.plyerState.length-1){
+        if(cnt === this.playerState.length-1){
           // 게임 끝
           console.log("게임끝");
 
