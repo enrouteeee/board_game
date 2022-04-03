@@ -53,6 +53,7 @@
                           ?
                         </v-card-text>
                       </v-card>
+
                       <v-card v-else v-bind:color="card.color">
                         <v-card-text v-if="order[idx].id==userId">
                           {{ card.number }}
@@ -65,6 +66,11 @@
                           ?
                         </v-card-text>
                       </v-card>
+
+                      <v-card-subtitle v-if="getLastCard(idx) === idx2">
+                        ▴
+                      </v-card-subtitle>
+
                     </v-col>
                   </v-row>
                 </v-container>
@@ -435,6 +441,7 @@ export default {
           console.log("예측 실패!");
           this.predictState += "\n예측 실패!";
           // 자신이 마지막으로 가져온 카드를 뒤집기
+
           for(i=0; i<this.order.length; i++){
             if(this.order[i].nickname === content.sender){
               break;
@@ -442,18 +449,7 @@ export default {
           }
           
           // 예측실패 시 뒤집을 카드 찾기
-          var num;
-          for(var c=this.playerCardsOrder[i].length-1; c>=0; c--){
-            if(this.playerCardsOrder[i][c].flipped === false){
-              num = this.playerCardsOrder[i][c].number;
-              break;
-            }
-          }
-          for(c=0; c<this.playerCards[i].length; c++){
-            if(num === this.playerCards[i][c].number){
-              break;
-            }
-          }
+          var c = this.getLastCard(i);
 
           if(this.cardFlip(i, c)){
             return;
@@ -584,6 +580,21 @@ export default {
           gameId:this.gameId,
         })
       );
+    },
+    getLastCard(idx) {
+      var card;
+      for(var c=this.playerCardsOrder[idx].length-1; c>=0; c--){
+        if(this.playerCardsOrder[idx][c].flipped === false){
+          card = this.playerCardsOrder[idx][c];
+          break;
+        }
+      }
+      for(c=0; c<this.playerCards[idx].length; c++){
+        if(card === this.playerCards[idx][c]){
+          break;
+        }
+      }
+      return c;
     },
     cardFlip(playerIdx, cardIdx) {
       // 게임 끝났으면 return true, 게임 안끝났으면 return fasle
