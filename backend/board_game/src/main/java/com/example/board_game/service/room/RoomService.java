@@ -80,6 +80,10 @@ public class RoomService {
         }
     }
 
+    public void finishGame(Long roomId) {
+        findOne(roomId).finishGame();
+    }
+
     public void exitRoom(Long roomId, User user) {
         Room room = findOne(roomId);
         room.exit(user);

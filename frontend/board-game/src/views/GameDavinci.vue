@@ -1,12 +1,14 @@
 <template>
   <v-container>
-    <v-btn @click="exitGame">
-      나가기
-    </v-btn>
-    <v-btn v-if="gameState === 'FINISH'" @click="returnToRoom">
-      방으로 돌아가기
-    </v-btn>
     <v-row>
+      <v-col cols="7"></v-col>
+      <v-col cols="2">
+        <v-btn v-if="gameState === 'FINISH'" @click="returnToRoom">방으로 돌아가기</v-btn>
+      </v-col>
+      <v-col cols="1"></v-col>
+      <v-col cols="2">
+        <v-btn @click="exitGame">나가기</v-btn>
+      </v-col>
       <v-col cols="6">
         <h1 v-if="gameState==='INIT' && initCount===4">
             준비 완료
@@ -463,6 +465,21 @@ export default {
         
         //턴 넘기기
         this.passTurn();
+      } else if (content.type === "EXIT") {
+        console.log("EXIT");
+
+        // 나간 플레이어 카드 모두 뒤집기
+        for(i=0; i<this.order.length; i++) {
+          if(this.order[i].nickname === content.sender){
+            for(j=0; j<this.playerCards[i].length; j++){
+              this.cardFlip(i, j);
+            }
+            break;
+          }
+        }
+
+        // 나가 플레이어 상태 변경
+        this.playerDie(i);
       }
 
     },
@@ -573,36 +590,56 @@ export default {
         }
       }
       if(flag) {
-        this.playerState[playerIdx] = "DIE";
-
-        var cnt = 0;
-        for(i=0; i<this.playerState.length; i++) {
-          if(this.playerState[i] === "DIE"){
-            cnt++;
-          } else if(this.playerState[i] == "ALIVE") {
-            this.victoryNickname = this.order[i].nickname;
-          }
-        }
-
-        if(cnt === this.playerState.length-1){
-          // 게임 끝
-          console.log("게임끝");
-
-          //게임 끝 로직
-          this.finishGame();
-          return true;
-        }
+        return this.playerDie(playerIdx);
       }
 
       return false;
     },
+    playerDie(idx) {
+      this.playerState[idx] = "DIE";
+
+      var cnt = 0;
+      for(var i=0; i<this.playerState.length; i++) {
+        if(this.playerState[i] === "DIE"){
+          cnt++;
+        } else if(this.playerState[i] == "ALIVE") {
+          this.victoryNickname = this.order[i].nickname;
+        }
+      }
+
+      if(cnt === this.playerState.length-1){
+        // 게임 끝
+        console.log("게임끝");
+
+        //게임 끝 로직
+        this.finishGame();
+        return true;
+      }
+      return false;
+    },
     finishGame() {
       this.gameState = "FINISH";
+      this.stomp.send(
+        "/pub/game",
+        JSON.stringify({
+          sender: this.nickname,
+          type:"FINISH",
+          gameId:this.gameId,
+        })
+      );
     },
     returnToRoom() {
       this.$router.go(-1);
     },
     exitGame() {
+      this.stomp.send(
+        "/pub/game",
+        JSON.stringify({
+          sender: this.nickname,
+          type:"EXIT",
+          gameId:this.gameId,
+        })
+      );
       this.$router.push("/room-list");
     },
   
