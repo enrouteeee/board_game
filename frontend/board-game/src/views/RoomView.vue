@@ -37,6 +37,7 @@
       <v-col v-for="(item, idx) in userList" :key="idx" cols="2">
         <v-card>
           <v-card-title>{{ item }}</v-card-title>
+          <v-sub-title v-if="owner === userList[idx]">방장</v-sub-title>
           <v-card-text>
             <v-icon color="black" size="40">person</v-icon>
           </v-card-text>
@@ -56,6 +57,7 @@ export default {
       nickname: this.$store.state.nickname,
       roomId: this.$route.params.roomId,
       roomName: "",
+      owner: "",
       userList: [],
       chatList: [],
       msg: "",
@@ -73,9 +75,9 @@ export default {
         .get("/api/room/"+this.roomId)
         .then((res) => {
           if (res.status === 200) {
-            console.log(res.data);
             this.userList = res.data.nicknames;
             this.roomName = res.data.roomName;
+            this.owner = res.data.owner;
           }
         });
       } catch (error) {
@@ -139,8 +141,14 @@ export default {
       this.$router.push("/room-list");
     },
     startGame() {
-      this.stomp.send("/pub/room", JSON.stringify({sender: this.nickname, type: "START", roomId: this.roomId}), {});
+      // 방장만 실행 가능
+      if(this.owner === this.nickname){
+        this.stomp.send("/pub/room", JSON.stringify({sender: this.nickname, type: "START", roomId: this.roomId}), {});
+      }
     },
+    readyClick() {
+      this.ready = !this.ready;
+    }
   },
 }
 </script>
