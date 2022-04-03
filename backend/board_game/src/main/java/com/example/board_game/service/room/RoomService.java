@@ -46,7 +46,7 @@ public class RoomService {
     public GetRoomInfoDto getRoomUsers(Long roomId) {
         Room room = findOne(roomId);
 
-        return new GetRoomInfoDto(room.getName(), room.getUsers());
+        return new GetRoomInfoDto(room);
     }
 
     public boolean checkAbleToEnter(Long roomId) {
