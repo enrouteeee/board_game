@@ -3,6 +3,7 @@ package com.example.board_game.controller.stomp;
 import com.example.board_game.domain.user.User;
 import com.example.board_game.dto.game.davinciCode.DavinciCodeCommand;
 import com.example.board_game.service.game.DavinciCodeService;
+import com.example.board_game.service.room.RoomService;
 import com.example.board_game.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -16,6 +17,7 @@ public class DavinciCodeCommandController {
     private final SimpMessagingTemplate template;
     private final UserService userService;
     private final DavinciCodeService davinciCodeService;
+    private final RoomService roomService;
 
     @MessageMapping("/game")
     public void sendCommand(DavinciCodeCommand command) {
@@ -38,6 +40,14 @@ public class DavinciCodeCommandController {
                 break;
             case PASS_TURN:
                 System.out.println("차례를 넘김");
+                break;
+            case EXIT:
+                System.out.println("방에서 나감");
+                roomService.exitRoom(command.getGameId(), user);
+                break;
+            case FINISH:
+                System.out.println("게임 끝남");
+                roomService.finishGame(command.getGameId());
                 break;
         }
 

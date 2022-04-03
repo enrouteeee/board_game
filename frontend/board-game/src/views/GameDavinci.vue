@@ -1,12 +1,14 @@
 <template>
   <v-container>
-    <v-btn @click="exitGame">
-      나가기
-    </v-btn>
-    <v-btn v-if="gameState === 'FINISH'" @click="returnToRoom">
-      방으로 돌아가기
-    </v-btn>
     <v-row>
+      <v-col cols="7"></v-col>
+      <v-col cols="2">
+        <v-btn v-if="gameState === 'FINISH'" @click="returnToRoom">방으로 돌아가기</v-btn>
+      </v-col>
+      <v-col cols="1"></v-col>
+      <v-col cols="2">
+        <v-btn @click="exitGame">나가기</v-btn>
+      </v-col>
       <v-col cols="6">
         <h1 v-if="gameState==='INIT' && initCount===4">
             준비 완료
@@ -40,21 +42,35 @@
                   <v-row>
                     <v-col sm="2" v-for="(card, idx2) in player" :key="idx2" @click="predictCard(idx, idx2)">
                       <v-card dark v-if="card.color==='black'" v-bind:color="card.color">
-                        <v-card-text v-if="card.flipped || order[idx].id==userId">
+                        <v-card-text v-if="order[idx].id==userId">
+                          {{ card.number }}
+                          <div v-if="card.flipped">들킴</div>
+                        </v-card-text>
+                        <v-card-text v-else-if="card.flipped">
                           {{ card.number }}
                         </v-card-text>
                         <v-card-text v-else>
                           ?
                         </v-card-text>
                       </v-card>
+
                       <v-card v-else v-bind:color="card.color">
-                        <v-card-text v-if="card.flipped || order[idx].id==userId">
+                        <v-card-text v-if="order[idx].id==userId">
+                          {{ card.number }}
+                          <div v-if="card.flipped">들킴</div>
+                        </v-card-text>
+                        <v-card-text v-else-if="card.flipped">
                           {{ card.number }}
                         </v-card-text>
                         <v-card-text v-else>
                           ?
                         </v-card-text>
                       </v-card>
+
+                      <v-card-subtitle v-if="getLastCard(idx) === idx2">
+                        ▴
+                      </v-card-subtitle>
+
                     </v-col>
                   </v-row>
                 </v-container>
@@ -425,6 +441,7 @@ export default {
           console.log("예측 실패!");
           this.predictState += "\n예측 실패!";
           // 자신이 마지막으로 가져온 카드를 뒤집기
+
           for(i=0; i<this.order.length; i++){
             if(this.order[i].nickname === content.sender){
               break;
@@ -432,18 +449,7 @@ export default {
           }
           
           // 예측실패 시 뒤집을 카드 찾기
-          var num;
-          for(var c=this.playerCardsOrder[i].length-1; c>=0; c--){
-            if(this.playerCardsOrder[i][c].flipped === false){
-              num = this.playerCardsOrder[i][c].number;
-              break;
-            }
-          }
-          for(c=0; c<this.playerCards[i].length; c++){
-            if(num === this.playerCards[i][c].number){
-              break;
-            }
-          }
+          var c = this.getLastCard(i);
 
           if(this.cardFlip(i, c)){
             return;
@@ -463,6 +469,21 @@ export default {
         
         //턴 넘기기
         this.passTurn();
+      } else if (content.type === "EXIT") {
+        console.log("EXIT");
+
+        // 나간 플레이어 카드 모두 뒤집기
+        for(i=0; i<this.order.length; i++) {
+          if(this.order[i].nickname === content.sender){
+            for(j=0; j<this.playerCards[i].length; j++){
+              this.cardFlip(i, j);
+            }
+            break;
+          }
+        }
+
+        // 나가 플레이어 상태 변경
+        this.playerDie(i);
       }
 
     },
@@ -560,6 +581,21 @@ export default {
         })
       );
     },
+    getLastCard(idx) {
+      var card;
+      for(var c=this.playerCardsOrder[idx].length-1; c>=0; c--){
+        if(this.playerCardsOrder[idx][c].flipped === false){
+          card = this.playerCardsOrder[idx][c];
+          break;
+        }
+      }
+      for(c=0; c<this.playerCards[idx].length; c++){
+        if(card === this.playerCards[idx][c]){
+          break;
+        }
+      }
+      return c;
+    },
     cardFlip(playerIdx, cardIdx) {
       // 게임 끝났으면 return true, 게임 안끝났으면 return fasle
 
@@ -573,36 +609,60 @@ export default {
         }
       }
       if(flag) {
-        this.playerState[playerIdx] = "DIE";
-
-        var cnt = 0;
-        for(i=0; i<this.playerState.length; i++) {
-          if(this.playerState[i] === "DIE"){
-            cnt++;
-          } else if(this.playerState[i] == "ALIVE") {
-            this.victoryNickname = this.order[i].nickname;
-          }
-        }
-
-        if(cnt === this.playerState.length-1){
-          // 게임 끝
-          console.log("게임끝");
-
-          //게임 끝 로직
-          this.finishGame();
-          return true;
-        }
+        return this.playerDie(playerIdx);
       }
 
       return false;
     },
+    playerDie(idx) {
+      this.playerState[idx] = "DIE";
+
+      var cnt = 0;
+      for(var i=0; i<this.playerState.length; i++) {
+        if(this.playerState[i] === "DIE"){
+          cnt++;
+        } else if(this.playerState[i] == "ALIVE") {
+          this.victoryNickname = this.order[i].nickname;
+        }
+      }
+
+      if(cnt === this.playerState.length-1){
+        // 게임 끝
+        console.log("게임끝");
+
+        //게임 끝 로직
+        this.finishGame();
+        return true;
+      }
+      return false;
+    },
     finishGame() {
       this.gameState = "FINISH";
+      this.stomp.send(
+        "/pub/game",
+        JSON.stringify({
+          sender: this.nickname,
+          type:"FINISH",
+          gameId:this.gameId,
+        })
+      );
     },
     returnToRoom() {
+      this.stomp.disconnect();
       this.$router.go(-1);
     },
     exitGame() {
+      this.stomp.send(
+        "/pub/game",
+        JSON.stringify({
+          sender: this.nickname,
+          type:"EXIT",
+          gameId:this.gameId,
+        })
+      );
+      if(this.stomp){
+        this.stomp.disconnect();
+      }
       this.$router.push("/room-list");
     },
   

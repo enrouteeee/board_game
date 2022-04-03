@@ -142,7 +142,7 @@ export default {
     },
     exitRoom() {
       this.stomp.send("/pub/room", JSON.stringify({sender: this.nickname, type: "EXIT", roomId: this.roomId}), {});
-
+      this.stomp.disconnect();
       this.$router.push("/room-list");
     },
     startGame() {
