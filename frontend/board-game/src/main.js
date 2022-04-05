@@ -5,7 +5,8 @@ import store from './store/index'
 import axios from 'axios'
 
 Vue.prototype.$axios = axios
-axios.defaults.baseURL = 'http://localhost:8080'
+// axios.defaults.baseURL = 'http://localhost:8080'
+axios.defaults.baseURL = 'http://13.209.194.97:8080'
 
 //vuetify
 import Vuetify from 'vuetify'
