@@ -21,8 +21,6 @@ public class DavinciCodeCommandController {
 
     @MessageMapping("/game")
     public void sendCommand(DavinciCodeCommand command) {
-        System.out.println(command);
-
         User user = userService.findUserById(command.getUserId());
 
         switch (command.getType()) {
@@ -32,9 +30,11 @@ public class DavinciCodeCommandController {
                 break;
             case SELECT_CARD_POSITION:
                 System.out.println("카드 위치를 선택함");
+                davinciCodeService.selectCardPosition(command);
                 break;
             case PREDICT_CARD:
                 System.out.println("카드를 예측함");
+                davinciCodeService.predictCard(command);
                 break;
             case PASS_TURN:
                 System.out.println("차례를 넘김");
@@ -42,6 +42,9 @@ public class DavinciCodeCommandController {
             case EXIT:
                 System.out.println("게임에서 나감");
                 roomService.exitRoom(command.getGameId(), user);
+                if(roomService.getRoomPlaying(command.getGameId())){
+                    davinciCodeService.exitGame(command);
+                }
                 break;
         }
 

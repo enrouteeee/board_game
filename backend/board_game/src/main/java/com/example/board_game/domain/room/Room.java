@@ -18,7 +18,7 @@ public class Room {
     private User owner;
     private List<User> users = new ArrayList<>();
 
-    private Game game;
+    private Game game = null;
 
     private boolean playing;    //게임 중인지 아닌지
 
@@ -74,13 +74,11 @@ public class Room {
     }
 
     public boolean checkStart() {
-        /*
-        더미 데이터
-         */
-//        if(game == null){
-//            throw new IllegalArgumentException("게임이 정해지지 않았습니다.");
-//        }
-        setGame(new DavinciCode(this.id, getNumberOfUsers()));
+        setGame(new DavinciCode(this.id, getNumberOfUsers(), this));    // 더미 데이터
+
+        if(this.game == null){
+            throw new IllegalArgumentException("게임이 정해지지 않았습니다.");
+        }
 
         return this.game.checkStart();
     }
@@ -95,6 +93,7 @@ public class Room {
     }
 
     public void finishGame() {
+        this.game = null;
         this.playing = false;
     }
 

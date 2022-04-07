@@ -25,17 +25,15 @@ public class Board {
         }
     }
 
-    public Card selected(CardNumber number, CardColor color) {
-        Card selectedCard = null;
-        for (Card card : cards) {
-            if(card.getNumber().equals(number) && card.getColor().equals(color)) {
-                selectedCard = card;
-                cards.remove(card);
-                break;
-            }
+    public Card selected(Card card, int idx) {
+        Card selectedCard;
+        if(cards.get(idx).equals(card)) {
+            selectedCard = cards.get(idx);
+        } else {
+            throw new IllegalArgumentException("해당 카드가 존재하지 않습니다.");
         }
-        if(selectedCard == null)
-            throw new IllegalArgumentException("카드가 존재하지 않습니다.");
+        cards.remove(card);
+
         return selectedCard;
     }
 

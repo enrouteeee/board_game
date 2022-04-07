@@ -22,6 +22,29 @@ public class DavinciCodeService {
     public void selectCard(DavinciCodeCommand command) {
         DavinciCode game = findGame(command.getGameId());
 
+        game.selectCard(command.getUserId(), command.getBoardIdx(), command.getCard().toCard());
+    }
+
+    public void selectCardPosition(DavinciCodeCommand command) {
+        DavinciCode game = findGame(command.getGameId());
+
+        game.selectCardPosition(command.getUserId(), command.getPlayerCardIdx(), command.getCard().toCard());
+    }
+
+    public void predictCard(DavinciCodeCommand command) {
+        DavinciCode game = findGame(command.getGameId());
+
+        game.predictCard(
+                command.getUserId(),
+                command.getPlayerIdx(),
+                DavinciCodeCommand.stringToCardNumber(command.getPredictNum()),
+                command.getPlayerCardIdx());
+    }
+
+    public void exitGame(DavinciCodeCommand command) {
+        DavinciCode game = findGame(command.getGameId());
+
+        game.exitPlayer(command.getUserId());
     }
 
     private DavinciCode findGame(Long id) {

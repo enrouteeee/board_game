@@ -22,7 +22,17 @@ public class Card {
         flipped = true;
     }
 
-    public boolean checkCard(CardNumber number) {
+    public boolean compareNumber(CardNumber number) {
         return this.number.equals(number);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Card) {
+            Card card = (Card) obj;
+            return this.number == card.number && this.color == card.color;
+        } else {
+            return false;
+        }
     }
 }
