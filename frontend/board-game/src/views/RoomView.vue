@@ -41,8 +41,8 @@
       </v-col>
       <v-col v-for="(item, idx) in userList" :key="idx" cols="2">
         <v-card>
-          <v-card-title>{{ item }}</v-card-title>
-          <v-sub-title v-if="owner === userList[idx]">방장</v-sub-title>
+          <v-card-title>{{ item.nickname }}</v-card-title>
+          <v-sub-title v-if="ownerId === item.id">방장</v-sub-title>
           <v-card-text>
             <v-icon color="black" size="40">person</v-icon>
           </v-card-text>
@@ -59,10 +59,11 @@ import SockJS from 'sockjs-client'
 export default {
   data() {
     return {
+      userId: this.$store.state.userId,
       nickname: this.$store.state.nickname,
       roomId: this.$route.params.roomId,
       roomName: "",
-      owner: "",
+      ownerId: "",
       userList: [],
       chatList: [],
       msg: "",
@@ -80,9 +81,9 @@ export default {
         .get("/api/room/"+this.roomId)
         .then((res) => {
           if (res.status === 200) {
-            this.userList = res.data.nicknames;
+            this.userList = res.data.users;
             this.roomName = res.data.roomName;
-            this.owner = res.data.owner;
+            this.ownerId = res.data.ownerId;
           }
         });
       } catch (error) {
@@ -90,8 +91,8 @@ export default {
       }
     },
     connect() {
-      // const serverURL = "http://localhost:8080/ws-stomp";
-      const serverURL = "http://http://13.209.194.97:8080/ws-stomp"
+      const serverURL = "http://localhost:8080/ws-stomp";
+      // const serverURL = "http://http://13.209.194.97:8080/ws-stomp"
       let socket = new SockJS(serverURL);
       this.stomp = Stomp.over(socket);
       
@@ -108,13 +109,15 @@ export default {
       } catch (error) {
         console.log(error);
       }
+
+      var sender = this.getNickname(content.userId);
       
       if(content.type === "ENTER") {
         console.log("ENTER");
         this.getRoomInfo();
       } else if(content.type === "CHAT") {
         console.log("CHAT");
-        this.chatList.push(content.sender+": "+content.message);
+        this.chatList.push(sender+": "+content.message);
       } else if(content.type === "EXIT") {
         console.log("EXIT");
         this.getRoomInfo();
@@ -133,27 +136,37 @@ export default {
       }
     },
     enterRoom() {
-      if(!this.userList.includes(this.nickname)){
-        this.stomp.send("/pub/room", JSON.stringify({sender: this.nickname, type: "ENTER", roomId: this.roomId}), {});
+      for(var i=0; i<this.userList.length; i++) {
+        if(this.userList[i].id === this.userId){
+          return;
+        }
       }
+      this.stomp.send("/pub/room", JSON.stringify({userId: this.userId, type: "ENTER", roomId: this.roomId}), {});
     },
     submitChat() {
-      this.stomp.send("/pub/room", JSON.stringify({sender: this.nickname, type: "CHAT", roomId: this.roomId, message: this.msg}), {});
+      this.stomp.send("/pub/room", JSON.stringify({userId: this.userId, type: "CHAT", roomId: this.roomId, message: this.msg}), {});
       this.msg = "";
     },
     exitRoom() {
-      this.stomp.send("/pub/room", JSON.stringify({sender: this.nickname, type: "EXIT", roomId: this.roomId}), {});
+      this.stomp.send("/pub/room", JSON.stringify({userId: this.userId, type: "EXIT", roomId: this.roomId}), {});
       this.stomp.disconnect();
       this.$router.push("/room-list");
     },
     startGame() {
       // 방장만 실행 가능
-      if(this.owner === this.nickname){
-        this.stomp.send("/pub/room", JSON.stringify({sender: this.nickname, type: "START", roomId: this.roomId}), {});
+      if(this.ownerId === this.userId){
+        this.stomp.send("/pub/room", JSON.stringify({userId: this.userId, type: "START", roomId: this.roomId}), {});
       }
     },
     readyClick() {
       this.ready = !this.ready;
+    },
+    getNickname(id) {
+      for(var i=0; i<this.userList.length; i++) {
+        if(this.userList[i].id === id){
+          return this.userList[i].nickname;
+        }
+      }
     }
   },
 }

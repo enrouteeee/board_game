@@ -9,16 +9,30 @@ public class Card {
     private boolean flipped;
 
     public Card(CardNumber number, CardColor color) {
+        this(number, color, false);
+    }
+
+    public Card(CardNumber number, CardColor color, boolean flipped) {
         this.number = number;
         this.color = color;
-        flipped = false;
+        this.flipped = flipped;
     }
 
     public void flipped() {
         flipped = true;
     }
 
-    public boolean checkCard(CardNumber number) {
+    public boolean compareNumber(CardNumber number) {
         return this.number.equals(number);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Card) {
+            Card card = (Card) obj;
+            return this.number == card.number && this.color == card.color;
+        } else {
+            return false;
+        }
     }
 }

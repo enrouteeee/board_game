@@ -10,14 +10,14 @@ import java.util.List;
 @Getter
 public class GetRoomInfoDto {
     private String roomName;
-    private List<String> nicknames = new ArrayList<>();
-    private String owner;
+    private List<GetUserDto> users = new ArrayList<>();
+    private Long ownerId;
 
     public GetRoomInfoDto(Room room) {
         this.roomName = room.getName();
         for (User user : room.getUsers()) {
-            nicknames.add(user.getNickname());
+            users.add(new GetUserDto(user));
         }
-        this.owner = room.getOwner().getNickname();
+        this.ownerId = room.getOwner().getId();
     }
 }

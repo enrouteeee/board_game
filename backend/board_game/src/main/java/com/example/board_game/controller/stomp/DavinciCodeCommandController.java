@@ -16,38 +16,35 @@ public class DavinciCodeCommandController {
 
     private final SimpMessagingTemplate template;
     private final UserService userService;
-    private final DavinciCodeService davinciCodeService;
     private final RoomService roomService;
+    private final DavinciCodeService davinciCodeService;
 
     @MessageMapping("/game")
     public void sendCommand(DavinciCodeCommand command) {
-        System.out.println(command);
-
-        User user = userService.findUserByNickname(command.getSender());
+        User user = userService.findUserById(command.getUserId());
 
         switch (command.getType()) {
             case SELECT_CARD:
                 System.out.println("보드에서 카드를 선택함");
+                davinciCodeService.selectCard(command);
                 break;
             case SELECT_CARD_POSITION:
                 System.out.println("카드 위치를 선택함");
+                davinciCodeService.selectCardPosition(command);
                 break;
             case PREDICT_CARD:
                 System.out.println("카드를 예측함");
-                break;
-            case MORE_PREDICT:
-                System.out.println("한번 더 예측함");
+                davinciCodeService.predictCard(command);
                 break;
             case PASS_TURN:
                 System.out.println("차례를 넘김");
                 break;
             case EXIT:
-                System.out.println("방에서 나감");
+                System.out.println("게임에서 나감");
                 roomService.exitRoom(command.getGameId(), user);
-                break;
-            case FINISH:
-                System.out.println("게임 끝남");
-                roomService.finishGame(command.getGameId());
+                if(roomService.getRoomPlaying(command.getGameId())){
+                    davinciCodeService.exitGame(command);
+                }
                 break;
         }
 

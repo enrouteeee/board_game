@@ -20,17 +20,16 @@ public class RoomCommandController {
     @MessageMapping("/room")
     public void sendCommand(RoomCommand command) {
         System.out.println(command);
-        User user = userService.findUserByNickname(command.getSender());
+        User user = userService.findUserById(command.getUserId());
 
         switch (command.getType()) {
             case ENTER:
                 System.out.println("방에 입장함");
                 roomService.joinRoom(command.getRoomId(), user);
-                command.setMessage(command.getSender()+"님이 방에 입장하셨습니다.");
                 break;
             case EXIT:
+                System.out.println("방에서 나감");
                 roomService.exitRoom(command.getRoomId(), user);
-                command.setMessage(command.getSender()+"님이 방에서 퇴장하셨습니다.");
                 break;
             case CHAT:
                 // 채팅 관리 로직

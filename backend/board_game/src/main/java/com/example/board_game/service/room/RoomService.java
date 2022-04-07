@@ -49,6 +49,12 @@ public class RoomService {
         return new GetRoomInfoDto(room);
     }
 
+    public boolean getRoomPlaying(Long roomId) {
+        Room room = findOne(roomId);
+
+        return room.isPlaying();
+    }
+
     public boolean checkAbleToEnter(Long roomId) {
         Room room = findOne(roomId);
 
@@ -78,10 +84,6 @@ public class RoomService {
         } else {
             return false;
         }
-    }
-
-    public void finishGame(Long roomId) {
-        findOne(roomId).finishGame();
     }
 
     public void exitRoom(Long roomId, User user) {

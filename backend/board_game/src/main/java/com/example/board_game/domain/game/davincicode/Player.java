@@ -11,6 +11,7 @@ public class Player {
     private Long userId;
     private String nickname;
     private List<Card> cards = new ArrayList<>();
+    private Card selectCard;
 
     private PlayerState state;
 
@@ -22,37 +23,22 @@ public class Player {
         state = PlayerState.PLAYING;
     }
 
-    // 카드 추가 - 기본적으로 순서를 맞춰서
-    public void addCard(Card card) {
-        int index=0;
-        for(; index< cards.size(); index++){
-            if(card.getNumber().ordinal() > cards.get(index).getNumber().ordinal()) {
-                break;
-            } else if (card.getNumber().ordinal() == cards.get(index).getNumber().ordinal()) {
-                if (card.getColor() == CardColor.WHITE) {
-                    index++;
-                }
-                break;
-            }
-        }
-        cards.add(index, card);
-        this.lastAddedCardIndex = index;
+    public void selectCard(Card card) {
+        this.selectCard = card;
     }
 
-    // 카드 추가 - 패에 조커가 있는 경우 위치를 지정해서
-    public void addCard(Card card, int index){
-        cards.add(index, card);
-        int tmp = this.lastAddedCardIndex;
-        this.lastAddedCardIndex = index;
-
-        boolean flag = checkCardOrder();
-        if(flag) {
-            cards.remove(index);
-            this.lastAddedCardIndex = tmp;
-            throw new IllegalArgumentException("카드를 놓을 수 없는 자리 입니다.");
+    public void selectCardPosition(Integer playerCardIdx, Card card) {
+        if(selectCard.equals(card)) {
+            cards.add(playerCardIdx, card);
+            this.lastAddedCardIndex = playerCardIdx;
+        } else {
+            throw new IllegalArgumentException("카드가 맞지 않습니다.");
         }
     }
 
+    /*
+    카드 순서가 맞는지 확인
+     */
     private boolean checkCardOrder() {
         boolean flag = true;
 
@@ -74,19 +60,11 @@ public class Player {
     }
 
     public boolean checkCardNumber(CardNumber cardNumber, int index) {
-        return cards.get(index).getNumber().equals(cardNumber);
+        return cards.get(index).compareNumber(cardNumber);
     }
 
     public Long getId(){
         return this.userId;
-    }
-
-    public int getNumberOfCard() {
-        return cards.size();
-    }
-
-    public int getLastAddedCardIndex() {
-        return lastAddedCardIndex;
     }
 
     public void flipCard(int index) {
@@ -97,6 +75,10 @@ public class Player {
         }
     }
 
+    public void flipLastCard() {
+        flipCard(this.lastAddedCardIndex);
+    }
+
     public boolean checkOut() {
         for (Card card : cards) {
             if (!card.isFlipped()) {
@@ -104,5 +86,12 @@ public class Player {
             }
         }
         return true;
+    }
+
+    public void AllFlip() {
+        for (Card card : cards) {
+            card.flipped();
+        }
+        this.state = PlayerState.OUT;
     }
 }

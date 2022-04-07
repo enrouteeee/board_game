@@ -14,7 +14,7 @@ public class RoomCommand {
         ENTER, EXIT, CHAT, START
     }
 
-    private String sender;
+    private Long userId;
     private RoomCommandType type;
     private Long roomId;
     private String message;

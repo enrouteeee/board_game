@@ -295,6 +295,13 @@ export default {
         console.log(error);
       }
     },
+    getNickname(id) {
+      for(var i=0; i<this.order.length; i++) {
+        if(this.order[i].id === id){
+          return this.order[i].nickname;
+        }
+      }
+    },
     connect() {
       const serverURL = "http://localhost:8080/ws-stomp"
       let socket = new SockJS(serverURL);
@@ -319,17 +326,17 @@ export default {
         // 뽑은 사람 찾기
         var i;
         for(i=0; i<this.order.length; i++){
-          if(this.order[i].nickname === content.sender){
+          if(this.order[i].id === content.userId){
             break;
           }
         }
         this.selectPlayer = i;
 
         // 보드판에서 카드 가져가기
-        this.selectedCard = this.boardCards[content.content.idx];
-        this.boardCards.splice(content.content.idx, 1);
+        this.selectedCard = this.boardCards[content.boardIdx];
+        this.boardCards.splice(content.boardIdx, 1);
 
-        if(this.order[i].nickname != this.nickname){
+        if(this.order[i].id != this.userId){
           return;
         }
 
@@ -395,12 +402,12 @@ export default {
         console.log("SELECT_CARD_POSITION");
         
         for(i=0; i<this.order.length; i++){
-          if(this.order[i].nickname === content.sender){
+          if(this.order[i].id === content.userId){
             break;
           }
         }
-        this.playerCards[i].splice(content.content.position, 0, content.content.card);
-        this.playerCardsOrder[i].push(content.content.card);
+        this.playerCards[i].splice(content.playerCardIdx, 0, content.card);
+        this.playerCardsOrder[i].push(content.card);
 
         // 게임 상태에 따른 작업 후속 작업
         if(this.gameState === "INIT"){
@@ -422,14 +429,14 @@ export default {
       } else if (content.type === "PREDICT_CARD") {
         console.log("PREDICT_CARD");
 
-        this.predictState = content.sender+"님이 "+this.order[content.content.playerIdx].nickname+"님의 "
-          +(content.content.cardIdx+1)+"번째 카드를 "+content.content.number+"라고 예측했습니다.";
+        this.predictState = this.getNickname(content.userId)+"님이 "+this.order[content.playerIdx].nickname+"님의 "
+          +(content.playerCardIdx+1)+"번째 카드를 "+content.predictNum+"라고 예측했습니다.";
 
-        if(this.playerCards[content.content.playerIdx][content.content.cardIdx].number == content.content.number){
+        if(this.playerCards[content.playerIdx][content.playerCardIdx].number == content.predictNum){
           console.log("예측 성공!");
           this.predictState += "\n예측 성공!";
           // 예측한 카드 뒤집기
-          if(this.cardFlip(content.content.playerIdx, content.content.cardIdx)){
+          if(this.cardFlip(content.playerIdx, content.playerCardIdx)){
             return;
           }
 
@@ -443,7 +450,7 @@ export default {
           // 자신이 마지막으로 가져온 카드를 뒤집기
 
           for(i=0; i<this.order.length; i++){
-            if(this.order[i].nickname === content.sender){
+            if(this.order[i].id === content.userId){
               break;
             }
           }
@@ -462,7 +469,7 @@ export default {
         console.log("PASS_TURN");
 
         for(i=0; i<this.order.length; i++){
-          if(this.order[i].nickname === content.sender){
+          if(this.order[i].id === content.userId){
             break;
           }
         }
@@ -474,7 +481,7 @@ export default {
 
         // 나간 플레이어 카드 모두 뒤집기
         for(i=0; i<this.order.length; i++) {
-          if(this.order[i].nickname === content.sender){
+          if(this.order[i].id === content.userId){
             for(j=0; j<this.playerCards[i].length; j++){
               this.cardFlip(i, j);
             }
@@ -494,12 +501,11 @@ export default {
         this.stomp.send(
           "/pub/game",
           JSON.stringify({
-            sender: this.nickname,
+            userId: this.userId,
             type:"SELECT_CARD",
             gameId:this.gameId,
-            content:{
-              idx: idx
-            }
+            card:this.boardCards[idx],
+            boardIdx: idx
           })
         );
       }
@@ -513,13 +519,11 @@ export default {
       this.stomp.send(
         "/pub/game",
         JSON.stringify({
-          sender: this.nickname,
+          userId: this.userId,
           type:"SELECT_CARD_POSITION",
           gameId:this.gameId,
-          content: {
-            position: this.selectedPosition,
-            card: this.selectedCard
-          }
+          card: this.selectedCard,
+          playerCardIdx: this.selectedPosition
         })
       );
     },
@@ -541,14 +545,12 @@ export default {
       this.stomp.send(
         "/pub/game",
         JSON.stringify({
-          sender: this.nickname,
+          userId: this.userId,
           type:"PREDICT_CARD",
           gameId:this.gameId,
-          content: {
-            playerIdx: this.predictPlayerIdx,
-            cardIdx: this.predictCardIdx,
-            number: this.predictIdx
-          }
+          playerIdx: this.predictPlayerIdx,
+          playerCardIdx: this.predictCardIdx,
+          predictNum: this.predictIdx
         })
       );
     },
@@ -575,7 +577,7 @@ export default {
       this.stomp.send(
         "/pub/game",
         JSON.stringify({
-          sender: this.nickname,
+          userId: this.userId,
           type:"PASS_TURN",
           gameId:this.gameId,
         })
@@ -638,14 +640,6 @@ export default {
     },
     finishGame() {
       this.gameState = "FINISH";
-      this.stomp.send(
-        "/pub/game",
-        JSON.stringify({
-          sender: this.nickname,
-          type:"FINISH",
-          gameId:this.gameId,
-        })
-      );
     },
     returnToRoom() {
       this.stomp.disconnect();
@@ -655,7 +649,7 @@ export default {
       this.stomp.send(
         "/pub/game",
         JSON.stringify({
-          sender: this.nickname,
+          userId: this.userId,
           type:"EXIT",
           gameId:this.gameId,
         })
@@ -665,7 +659,6 @@ export default {
       }
       this.$router.push("/room-list");
     },
-  
   }
 }
 </script>
