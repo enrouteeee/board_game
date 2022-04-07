@@ -90,8 +90,8 @@ export default {
       }
     },
     connect() {
-      // const serverURL = "http://localhost:8080/ws-stomp";
-      const serverURL = "http://http://13.209.194.97:8080/ws-stomp"
+      const serverURL = "http://localhost:8080/ws-stomp";
+      // const serverURL = "http://http://13.209.194.97:8080/ws-stomp"
       let socket = new SockJS(serverURL);
       this.stomp = Stomp.over(socket);
       

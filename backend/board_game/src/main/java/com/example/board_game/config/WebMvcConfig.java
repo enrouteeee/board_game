@@ -9,7 +9,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("https://stately-pie-1e1d8b.netlify.app/")
+//                .allowedOrigins("https://stately-pie-1e1d8b.netlify.app/")
+                .allowedOrigins("http://localhost:3000/")
                 .allowedMethods("*")
                 .allowCredentials(true);
     }

@@ -2,6 +2,7 @@ package com.example.board_game.service.game;
 
 import com.example.board_game.domain.game.Game;
 import com.example.board_game.domain.game.davincicode.DavinciCode;
+import com.example.board_game.dto.game.davinciCode.DavinciCodeCommand;
 import com.example.board_game.dto.game.davinciCode.GetGameInfoDto;
 import com.example.board_game.service.room.RoomService;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +19,9 @@ public class DavinciCodeService {
         return new GetGameInfoDto(game);
     }
 
-    public void selectCard(Long id) {
+    public void selectCard(Long id, DavinciCodeCommand command) {
         DavinciCode game = findGame(id);
+
     }
 
     private DavinciCode findGame(Long id) {

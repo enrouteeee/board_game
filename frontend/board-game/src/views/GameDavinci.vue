@@ -638,14 +638,6 @@ export default {
     },
     finishGame() {
       this.gameState = "FINISH";
-      this.stomp.send(
-        "/pub/game",
-        JSON.stringify({
-          sender: this.nickname,
-          type:"FINISH",
-          gameId:this.gameId,
-        })
-      );
     },
     returnToRoom() {
       this.stomp.disconnect();
@@ -665,7 +657,6 @@ export default {
       }
       this.$router.push("/room-list");
     },
-  
   }
 }
 </script>

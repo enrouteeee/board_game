@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DavinciCode extends Game {
-    private List<Player> players = new ArrayList<>();
+    private List<Player> players;
     private Board board;
 
     private int numberOfLivePlayers;    // 1 이면 게임 종료
@@ -25,6 +25,7 @@ public class DavinciCode extends Game {
     @Override
     public void start(List<User> users) {
         int numberOfUsers = getNumberOfUsers();
+        players = new ArrayList<>();
         for (User user : users) {
             this.players.add(new Player(user));
         }
@@ -42,6 +43,9 @@ public class DavinciCode extends Game {
         Player player = findPlayer(playerId);
         player.addCard(selectedCard);
     }
+    /*
+    보드에서 가져온 카드 위치 설정하기
+     */
     public void selectCard(Long playerId, CardNumber number, CardColor color, int index) {
         Card selectedCard = board.selected(number, color);
         Player player = findPlayer(playerId);
