@@ -45,6 +45,12 @@ public class UserService {
         user.updateNickname(nickname);
     }
 
+    //유저아이디로 유저 찾기
+    public User findUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
+    }
+
     //닉네임으로 유저 찾기
     public User findUserByNickname(String nickname) {
         return userRepository.findByNickname(nickname)
