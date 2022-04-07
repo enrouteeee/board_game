@@ -9,9 +9,13 @@ public class Card {
     private boolean flipped;
 
     public Card(CardNumber number, CardColor color) {
+        this(number, color, false);
+    }
+
+    public Card(CardNumber number, CardColor color, boolean flipped) {
         this.number = number;
         this.color = color;
-        flipped = false;
+        this.flipped = flipped;
     }
 
     public void flipped() {

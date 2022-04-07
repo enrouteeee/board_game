@@ -5,9 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,5 +17,10 @@ public class DavinciCodeCommand {
     private Long userId;
     private DavinciCodeCommandType type;
     private Long gameId;
-    private Map<String, Object> content = new HashMap<>();
+
+    private CardDto card;       // select_card, select_card_position
+    private Long boardIdx;      // select_card
+    private Long playerCardIdx; // select_card_position, predict_card
+    private Long playerIdx;     // predict_card
+    private String predictNum;    // predict_card
 }

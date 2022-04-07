@@ -28,6 +28,7 @@ public class DavinciCodeCommandController {
         switch (command.getType()) {
             case SELECT_CARD:
                 System.out.println("보드에서 카드를 선택함");
+                davinciCodeService.selectCard(command);
                 break;
             case SELECT_CARD_POSITION:
                 System.out.println("카드 위치를 선택함");

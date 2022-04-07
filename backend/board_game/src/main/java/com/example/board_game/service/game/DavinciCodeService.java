@@ -19,8 +19,8 @@ public class DavinciCodeService {
         return new GetGameInfoDto(game);
     }
 
-    public void selectCard(Long id, DavinciCodeCommand command) {
-        DavinciCode game = findGame(id);
+    public void selectCard(DavinciCodeCommand command) {
+        DavinciCode game = findGame(command.getGameId());
 
     }
 
