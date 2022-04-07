@@ -17,7 +17,7 @@ public class DavinciCodeCommand {
         SELECT_CARD, SELECT_CARD_POSITION, PREDICT_CARD, PASS_TURN, EXIT
     }
 
-    private String sender;
+    private Long userId;
     private DavinciCodeCommandType type;
     private Long gameId;
     private Map<String, Object> content = new HashMap<>();

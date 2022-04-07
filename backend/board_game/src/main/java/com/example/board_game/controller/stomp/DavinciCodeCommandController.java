@@ -23,12 +23,11 @@ public class DavinciCodeCommandController {
     public void sendCommand(DavinciCodeCommand command) {
         System.out.println(command);
 
-        User user = userService.findUserByNickname(command.getSender());
+        User user = userService.findUserById(command.getUserId());
 
         switch (command.getType()) {
             case SELECT_CARD:
                 System.out.println("보드에서 카드를 선택함");
-                davinciCodeService.selectCard(command.getGameId(), command);
                 break;
             case SELECT_CARD_POSITION:
                 System.out.println("카드 위치를 선택함");

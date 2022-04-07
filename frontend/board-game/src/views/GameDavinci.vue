@@ -295,6 +295,13 @@ export default {
         console.log(error);
       }
     },
+    getNickname(id) {
+      for(var i=0; i<this.order.length; i++) {
+        if(this.order[i].id === id){
+          return this.order[i].nickname;
+        }
+      }
+    },
     connect() {
       const serverURL = "http://localhost:8080/ws-stomp"
       let socket = new SockJS(serverURL);
@@ -319,7 +326,7 @@ export default {
         // 뽑은 사람 찾기
         var i;
         for(i=0; i<this.order.length; i++){
-          if(this.order[i].nickname === content.sender){
+          if(this.order[i].id === content.userId){
             break;
           }
         }
@@ -329,7 +336,7 @@ export default {
         this.selectedCard = this.boardCards[content.content.idx];
         this.boardCards.splice(content.content.idx, 1);
 
-        if(this.order[i].nickname != this.nickname){
+        if(this.order[i].id != this.userId){
           return;
         }
 
@@ -395,7 +402,7 @@ export default {
         console.log("SELECT_CARD_POSITION");
         
         for(i=0; i<this.order.length; i++){
-          if(this.order[i].nickname === content.sender){
+          if(this.order[i].id === content.userId){
             break;
           }
         }
@@ -422,7 +429,7 @@ export default {
       } else if (content.type === "PREDICT_CARD") {
         console.log("PREDICT_CARD");
 
-        this.predictState = content.sender+"님이 "+this.order[content.content.playerIdx].nickname+"님의 "
+        this.predictState = this.getNickname(content.userId)+"님이 "+this.order[content.content.playerIdx].nickname+"님의 "
           +(content.content.cardIdx+1)+"번째 카드를 "+content.content.number+"라고 예측했습니다.";
 
         if(this.playerCards[content.content.playerIdx][content.content.cardIdx].number == content.content.number){
@@ -443,7 +450,7 @@ export default {
           // 자신이 마지막으로 가져온 카드를 뒤집기
 
           for(i=0; i<this.order.length; i++){
-            if(this.order[i].nickname === content.sender){
+            if(this.order[i].id === content.userId){
               break;
             }
           }
@@ -462,7 +469,7 @@ export default {
         console.log("PASS_TURN");
 
         for(i=0; i<this.order.length; i++){
-          if(this.order[i].nickname === content.sender){
+          if(this.order[i].id === content.userId){
             break;
           }
         }
@@ -474,7 +481,7 @@ export default {
 
         // 나간 플레이어 카드 모두 뒤집기
         for(i=0; i<this.order.length; i++) {
-          if(this.order[i].nickname === content.sender){
+          if(this.order[i].id === content.userId){
             for(j=0; j<this.playerCards[i].length; j++){
               this.cardFlip(i, j);
             }
@@ -494,7 +501,7 @@ export default {
         this.stomp.send(
           "/pub/game",
           JSON.stringify({
-            sender: this.nickname,
+            userId: this.userId,
             type:"SELECT_CARD",
             gameId:this.gameId,
             content:{
@@ -513,7 +520,7 @@ export default {
       this.stomp.send(
         "/pub/game",
         JSON.stringify({
-          sender: this.nickname,
+          userId: this.userId,
           type:"SELECT_CARD_POSITION",
           gameId:this.gameId,
           content: {
@@ -541,7 +548,7 @@ export default {
       this.stomp.send(
         "/pub/game",
         JSON.stringify({
-          sender: this.nickname,
+          userId: this.userId,
           type:"PREDICT_CARD",
           gameId:this.gameId,
           content: {
@@ -575,7 +582,7 @@ export default {
       this.stomp.send(
         "/pub/game",
         JSON.stringify({
-          sender: this.nickname,
+          userId: this.userId,
           type:"PASS_TURN",
           gameId:this.gameId,
         })
@@ -647,7 +654,7 @@ export default {
       this.stomp.send(
         "/pub/game",
         JSON.stringify({
-          sender: this.nickname,
+          userId: this.userId,
           type:"EXIT",
           gameId:this.gameId,
         })
