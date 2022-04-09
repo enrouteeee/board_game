@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Login from '@/views/LoginView.vue'
+import Redirect from '@/views/RedirectView.vue'
 import RoomList from '@/views/RoomListView.vue'
 import Room from '@/views/RoomView.vue'
 import GameDavinci from '@/views/GameDavinci.vue'
@@ -13,6 +14,10 @@ export default new Router({
     {
       path: '/',
       component: Login
+    },
+    {
+      path: '/oauth/redirect',
+      component: Redirect
     },
     {
       path: '/room-list',

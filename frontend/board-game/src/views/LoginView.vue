@@ -1,66 +1,26 @@
 <template>
-  <container class="mx-auto">
-    <v-row>
-      <v-form style="width: 400px; height: 500">
-        <div>
-          <v-icon color="black" size="30px">person</v-icon>
-          <div>
-            <v-text-field placeholder="email" v-model="email" required >
-            </v-text-field>
-          </div>
-        </div>
-        <div>
-          <v-icon color="black" size="30px">lock</v-icon>
-          <div>
-            <v-text-field placeholder="password" type="password" v-model="password" required >
-            </v-text-field>
-          </div>
-        </div>
-        <div style="height: 15px;"></div>
-        <v-btn color="#2c4f91" dark large block @click="loginSubmit" >Login</v-btn >
-        <div style="height: 15px;"></div>
-        <v-btn color="#2c4f91" dark large block @click.stop="dialog = true" >SingUp</v-btn >
-          <v-dialog v-model="dialog" max-width="400">
-            <v-card>
-              <v-card-title class="text-h5">회원 정보 입력</v-card-title>
-              <v-card-text>
-                <v-container>
-                  <v-col>
-                    <v-col>
-                      <v-text-field
-                        label="email"
-                        required
-                        v-model="signupEmail"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col>
-                      <v-text-field
-                        label="password"
-                        type="password"
-                        required
-                        v-model="signupPassword"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col>
-                      <v-text-field
-                        label="nickname"
-                        required
-                        v-model="signupNickname"
-                      ></v-text-field>
-                    </v-col>
-                  </v-col>
-                </v-container>
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="green darken-1" text @click=signup>만들기</v-btn>
-                <v-btn color="green darken-1" text @click="dialog = false">취소</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-      </v-form>
+  <v-container fill-height fluid>
+    <v-row align="center" justify="center">
+      <v-col cols="12">
+        <h1>로그인</h1>
+      </v-col>
+      <v-col cols="12">
+          <a href="http://localhost:8080/oauth2/authorization/google?redirect_uri=http://localhost:3000/oauth/redirect">
+            <img width="250" height="40" :src="require('../assets/google_login.png')"/>
+          </a>
+      </v-col>
+      <v-col cols="12">
+          <a href="http://localhost:8080/oauth2/authorization/naver?redirect_uri=http://localhost:3000/oauth/redirect">
+            <img width="250" height="40" :src="require('../assets/naver_login.png')"/>
+          </a>
+      </v-col>
+      <v-col cols="12">
+          <a href="http://localhost:8080/oauth2/authorization/kakao?redirect_uri=http://localhost:3000/oauth/redirect">
+            <img width="250" height="40" :src="require('../assets/kakao_login.png')"/>
+          </a>
+      </v-col>
     </v-row>
-  </container>
+  </v-container>
 </template>
 
 <script>
