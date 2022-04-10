@@ -19,7 +19,6 @@ public class RoomCommandController {
 
     @MessageMapping("/room")
     public void sendCommand(RoomCommand command) {
-        System.out.println(command);
         User user = userService.findUserById(command.getUserId());
 
         switch (command.getType()) {
