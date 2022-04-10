@@ -78,7 +78,11 @@ export default {
     getRoomInfo() {
       try { 
       this.$axios
-        .get("/api/room/"+this.roomId)
+        .get("/api/room/"+this.roomId, {
+            headers: {
+              'Auth': this.$store.state.token
+            }
+          })
         .then((res) => {
           if (res.status === 200) {
             this.userList = res.data.users;

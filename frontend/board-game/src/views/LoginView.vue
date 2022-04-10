@@ -25,61 +25,7 @@
 
 <script>
 export default {
-  data() {
-    return {
-      email: null,
-      password: null,
-      dialog: false,
-      signupEmail: null,
-      signupPassword: null,
-      signupNickname: null,
-    };
-  },
-  methods: {
-    loginSubmit() {
-      let request = {};
-      request.email = this.email;
-      request.password = this.password;
-
-      try { 
-        this.$axios
-          .post("/api/login", request, { withCredentials: true })
-          .then((res) => {
-            if (res.status === 200) {
-              console.log('로그인 성공', res.data);
-              this.$store.commit('setNickname', res.data.nickname);
-              this.$store.commit('setUserId', res.data.id);
-              this.$router.push("/room-list");
-            }
-          });
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    signup() {
-      let request = {};
-      request.email = this.signupEmail;
-      request.password = this.signupPassword;
-      request.nickname = this.signupNickname;
-
-      this.signupEmail = null;
-      this.signupPassword = null;
-      this.signupNickname = null;
-
-      try { 
-        this.$axios
-          .post("/api/signup", request, { withCredentials: true })
-          .then((res) => {
-            if (res.status === 200) {
-              console.log('회원가입 성공');
-              this.dialog = false;
-            }
-          });
-      } catch (error) {
-        console.log(error);
-      }
-    },
-  }
+  
 }
 </script>
 
