@@ -1,5 +1,6 @@
 package com.example.board_game.service.room;
 
+import com.example.board_game.auth.UserDto;
 import com.example.board_game.domain.game.Game;
 import com.example.board_game.domain.room.Room;
 import com.example.board_game.domain.room.RoomRepository;
@@ -9,7 +10,6 @@ import com.example.board_game.dto.room.CreateOrUpdateRoomDto;
 import com.example.board_game.dto.room.GetRoomHeaderDto;
 import com.example.board_game.dto.room.GetRoomHeaderListDto;
 import com.example.board_game.dto.room.GetRoomInfoDto;
-import com.example.board_game.dto.user.SessionUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +22,7 @@ public class RoomService {
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
 
-    public GetRoomHeaderDto createRoom(CreateOrUpdateRoomDto dto, SessionUser user) {
+    public GetRoomHeaderDto createRoom(CreateOrUpdateRoomDto dto, UserDto user) {
         User findUser = userRepository.findByEmail(user.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다"));
 

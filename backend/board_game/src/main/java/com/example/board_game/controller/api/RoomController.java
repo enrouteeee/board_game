@@ -1,16 +1,16 @@
 package com.example.board_game.controller.api;
 
+import com.example.board_game.auth.UserDto;
 import com.example.board_game.dto.room.CreateOrUpdateRoomDto;
 import com.example.board_game.dto.room.GetRoomHeaderDto;
 import com.example.board_game.dto.room.GetRoomHeaderListDto;
 import com.example.board_game.dto.room.GetRoomInfoDto;
-import com.example.board_game.dto.user.SessionUser;
 import com.example.board_game.service.room.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpSession;
 
 @RequiredArgsConstructor
 @RestController
@@ -20,8 +20,9 @@ public class RoomController {
     private final RoomService roomService;
 
     @PostMapping
-    public ResponseEntity<GetRoomHeaderDto> createRoom(@RequestBody CreateOrUpdateRoomDto dto, HttpSession session) {
-        SessionUser user = (SessionUser) session.getAttribute("user");
+    public ResponseEntity<GetRoomHeaderDto> createRoom(@RequestBody CreateOrUpdateRoomDto dto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDto user = (UserDto) authentication.getPrincipal();
 
         return ResponseEntity.ok(roomService.createRoom(dto, user));
     }
