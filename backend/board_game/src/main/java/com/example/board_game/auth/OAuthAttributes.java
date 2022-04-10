@@ -1,4 +1,4 @@
-package com.example.board_game.config.auth.dto;
+package com.example.board_game.auth;
 
 import com.example.board_game.domain.user.Role;
 import com.example.board_game.domain.user.User;

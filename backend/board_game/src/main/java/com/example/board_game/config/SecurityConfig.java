@@ -1,9 +1,9 @@
 package com.example.board_game.config;
 
+import com.example.board_game.auth.CustomOAuth2UserService;
 import com.example.board_game.auth.JwtAuthFilter;
 import com.example.board_game.auth.OAuth2SuccessHandler;
 import com.example.board_game.auth.token.TokenService;
-import com.example.board_game.config.auth.CustomOAuth2UserService;
 import com.example.board_game.domain.user.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

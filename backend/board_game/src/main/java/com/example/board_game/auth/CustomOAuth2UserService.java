@@ -1,6 +1,5 @@
-package com.example.board_game.config.auth;
+package com.example.board_game.auth;
 
-import com.example.board_game.config.auth.dto.OAuthAttributes;
 import com.example.board_game.domain.user.User;
 import com.example.board_game.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
