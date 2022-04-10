@@ -83,7 +83,11 @@ export default {
     getRoomList() {
       try { 
         this.$axios
-          .get("/api/room")
+          .get("/api/room", {
+            headers: {
+              'Auth': this.$store.state.token
+            }
+          })
           .then((res) => {
             if (res.status === 200) {
             console.log(res);
@@ -101,7 +105,12 @@ export default {
 
       try { 
         this.$axios
-          .post("/api/room", createRoomData, { withCredentials: true })
+          .post("/api/room", createRoomData, {
+            withCredentials: true,
+            headers: {
+              'Auth': this.$store.state.token
+            }
+          })
           .then((res) => {
             if (res.status === 200) {
               this.enterRoom(res.data.id);
@@ -117,7 +126,11 @@ export default {
 
       try { 
         this.$axios
-          .get("/api/room/"+id+"/enter")
+          .get("/api/room/"+id+"/enter", {
+            headers: {
+              'Auth': this.$store.state.token
+            }
+          })
           .then((res) => {
             if (res.status === 200) {
               if(res.data) {

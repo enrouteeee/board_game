@@ -1,58 +1,38 @@
 package com.example.board_game.controller.api;
 
-import com.example.board_game.dto.user.LoginDto;
-import com.example.board_game.dto.user.SessionUser;
-import com.example.board_game.dto.user.SignUpUserDto;
+import com.example.board_game.auth.UserDto;
+import com.example.board_game.dto.user.GetUserDto;
 import com.example.board_game.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpSession;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/user")
 public class UserController {
 
     private final UserService userService;
 
-    //회원가입
-    @PostMapping("/signup")
-    public ResponseEntity signUp(@RequestBody SignUpUserDto dto) {
-        userService.singUp(dto);
+    @GetMapping
+    public ResponseEntity<GetUserDto> getUserInfo() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDto user = (UserDto) authentication.getPrincipal();
 
-        return ResponseEntity.ok().build();
-    }
-
-    //로그인
-    @PostMapping("/login")
-    public ResponseEntity<SessionUser> login(@RequestBody LoginDto dto, HttpSession session) {
-        SessionUser user = userService.login(dto);
-
-        if(user == null){
-            throw new IllegalArgumentException("아이디 비밀번호가 틀렸습니다.");
-        }
-        session.setAttribute("user", user);
-
-        return ResponseEntity.ok(user);
-    }
-
-    //로그아웃
-    @PostMapping("/logout")
-    public ResponseEntity logout(HttpSession session) {
-        if (session != null) {
-            session.invalidate();
-        }
-
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(userService.getUserInfo(user.getEmail()));
     }
 
     //닉네임 수정
-    @PostMapping("/user/{userId}")
-    public ResponseEntity updateNickname(@RequestBody String nickname,
-                                         @PathVariable("userId") Long userId) {
-        userService.updateNickname(userId, nickname);
+    @PostMapping
+    public ResponseEntity updateNickname(@RequestBody String nickname) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDto user = (UserDto) authentication.getPrincipal();
+
+        System.out.println(user.getEmail() + "\nnickname : " + nickname);
+
+        userService.updateNickname(user.getEmail(), nickname);
 
         return ResponseEntity.ok().build();
     }

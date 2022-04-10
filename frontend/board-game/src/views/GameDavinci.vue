@@ -223,7 +223,11 @@ export default {
     getGameInfo() {
       try { 
         this.$axios
-          .get("/api/game/davinci/"+this.gameId)
+          .get("/api/game/davinci/"+this.gameId, {
+            headers: {
+              'Auth': this.$store.state.token
+            }
+          })
           .then((res) => {
           if (res.status === 200) {
             console.log(res.data);

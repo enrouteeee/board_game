@@ -7,7 +7,8 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     userId: "",
-    nickname: ""
+    nickname: "",
+    token: ""
   },
   getter: {
   },
@@ -17,6 +18,9 @@ export default new Vuex.Store({
     },
     setUserId: function(state, payload) {
       return state.userId = payload;
+    },
+    setToken: function(state, payload) {
+      return state.token = payload;
     }
   },
   action: {
