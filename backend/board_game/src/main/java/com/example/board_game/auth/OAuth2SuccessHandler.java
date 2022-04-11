@@ -25,20 +25,14 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
 
         String uid = (String) oAuth2User.getAttribute("email");
-        Token token = tokenService.generateToken(uid, "USER");
+        Token accessToken = tokenService.generateToken(uid, "USER");
+        Token refreshToken = tokenService.generateRefreshToken(uid, "USER");
 
-        writeTokenResponse(response, token);
+        response.addHeader("Auth", accessToken.getToken());
+        response.addHeader("Refresh", refreshToken.getToken());
+
         String targetUrl = UriComponentsBuilder.fromUriString("http://localhost:3000/oauth/redirect")
-                        .queryParam("token", token.getToken()).build().toUriString();
+                        .queryParam("token", accessToken.getToken()).build().toUriString();
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
-    }
-
-    private void writeTokenResponse(HttpServletResponse response, Token token)
-            throws IOException {
-        response.setContentType("text/html;charset=UTF-8");
-
-        response.addHeader("Auth", token.getToken());
-        response.addHeader("Refresh", token.getRefreshToken());
-        response.setContentType("application/json;charset=UTF-8");
     }
 }
