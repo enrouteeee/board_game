@@ -26,7 +26,7 @@ public class TokenController {
             Token newToken = tokenService.generateToken(email, "USER");
 
             response.addHeader("Auth", newToken.getToken());
-            response.addHeader("Refresh", newToken.getRefreshToken());
+//            response.addHeader("Refresh", newToken.getRefreshToken());
             response.setContentType("application/json;charset=UTF-8");
 
             return "HAPPY NEW TOKEN";

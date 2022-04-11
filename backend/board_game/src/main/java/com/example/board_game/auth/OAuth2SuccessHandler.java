@@ -2,6 +2,7 @@ package com.example.board_game.auth;
 
 import com.example.board_game.auth.token.Token;
 import com.example.board_game.auth.token.TokenService;
+import com.example.board_game.config.UriConst;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -31,7 +32,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         response.addHeader("Auth", accessToken.getToken());
         response.addHeader("Refresh", refreshToken.getToken());
 
-        String targetUrl = UriComponentsBuilder.fromUriString("http://localhost:3000/oauth/redirect")
+        String targetUrl = UriComponentsBuilder.fromUriString(UriConst.CLIENT_URI +"/oauth/redirect")
                         .queryParam("token", accessToken.getToken()).build().toUriString();
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
