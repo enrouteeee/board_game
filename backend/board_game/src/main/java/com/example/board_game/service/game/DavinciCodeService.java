@@ -4,14 +4,13 @@ import com.example.board_game.domain.game.Game;
 import com.example.board_game.domain.game.davincicode.DavinciCode;
 import com.example.board_game.dto.game.davinciCode.DavinciCodeCommand;
 import com.example.board_game.dto.game.davinciCode.GetGameInfoDto;
-import com.example.board_game.service.room.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
 public class DavinciCodeService {
-    private final RoomService roomService;
+    private final GameService gameService;
 
     public GetGameInfoDto getGameInfo(Long id) {
         DavinciCode game = findGame(id);
@@ -48,7 +47,7 @@ public class DavinciCodeService {
     }
 
     private DavinciCode findGame(Long id) {
-        Game game = roomService.findGame(id);
+        Game game = gameService.findOne(id);
 
         if(game instanceof DavinciCode) {
             return (DavinciCode) game;

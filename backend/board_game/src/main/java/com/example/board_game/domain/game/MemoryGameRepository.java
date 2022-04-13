@@ -1,4 +1,4 @@
-package com.example.board_game.domain.room;
+package com.example.board_game.domain.game;
 
 import org.springframework.stereotype.Repository;
 
@@ -9,24 +9,25 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
-public class RoomRepositoryMemory implements RoomRepository {
-    private static final Map<Long, Room> store = new ConcurrentHashMap<>();
+public class MemoryGameRepository implements GameRepository {
+
+    private static final Map<Long, Game> store = new ConcurrentHashMap<>();
     private static long sequence = 0L;
 
     @Override
-    public synchronized Room save(Room room) {
-        room.setId(++sequence);
-        store.put(room.getId(), room);
-        return room;
+    public Game save(Game game) {
+        game.setId(++sequence);
+        store.put(sequence, game);
+        return game;
     }
 
     @Override
-    public Optional<Room> findById(Long id) {
+    public Optional<Game> findById(Long id) {
         return Optional.ofNullable(store.get(id));
     }
 
     @Override
-    public List<Room> findAll() {
+    public List<Game> findAll() {
         return new ArrayList<>(store.values());
     }
 
