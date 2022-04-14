@@ -2,6 +2,8 @@ package com.example.board_game.domain.game.davincicode;
 
 import lombok.Getter;
 
+import java.util.Objects;
+
 @Getter
 public class Card {
     private final CardNumber number;
@@ -28,11 +30,16 @@ public class Card {
 
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof Card) {
-            Card card = (Card) obj;
-            return this.number == card.number && this.color == card.color;
-        } else {
-            return false;
-        }
+        if(obj == null) return false;
+        if(!(obj instanceof Card)) return false;
+        if(obj == this) return true;
+
+        Card card = (Card) obj;
+        return card.number == this.number && card.color == this.color;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(number, color);
     }
 }

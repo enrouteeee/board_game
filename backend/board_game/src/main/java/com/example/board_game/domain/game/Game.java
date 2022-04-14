@@ -7,26 +7,27 @@ import java.util.List;
 
 public abstract class Game {
     private Long id;
-    private final int numberOfUsers;
     private Room room;
 
-    public Game(Long id, int numberOfUsers, Room room) {
+    public Game(Long id, List<User> users, Room room) {
         this.id = id;
-        this.numberOfUsers = numberOfUsers;
         this.room = room;
+        init(users);
     }
 
-    public abstract boolean checkStart();
-
-    public abstract void start(List<User> users);
-
-    public int getNumberOfUsers() {
-        return numberOfUsers;
-    }
+    public abstract void init(List<User> users);
 
     public abstract void exitPlayer(Long playerId);
 
-    protected Room getRoom() {
+    public void finish() {
+        getRoom().finishGame();
+    }
+
+    public Long getId() {
+        return this.id;
+    }
+
+    private Room getRoom() {
         return this.room;
     }
 }

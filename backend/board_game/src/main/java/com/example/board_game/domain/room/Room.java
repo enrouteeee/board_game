@@ -1,13 +1,14 @@
 package com.example.board_game.domain.room;
 
 import com.example.board_game.domain.game.Game;
-import com.example.board_game.domain.game.davincicode.DavinciCode;
+import com.example.board_game.domain.game.GameInfo;
 import com.example.board_game.domain.user.User;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 public class Room {
@@ -18,7 +19,8 @@ public class Room {
     private User owner;
     private List<User> users = new ArrayList<>();
 
-    private Game game = null;
+    private GameInfo gameInfo;
+    private Game game;
 
     private boolean playing;    //게임 중인지 아닌지
 
@@ -59,7 +61,9 @@ public class Room {
     }
 
     public void join(User user) {
-        users.add(user);
+        if(isAbleToEnter()){
+            users.add(user);
+        }
     }
 
     public void exit(User user) {
@@ -74,22 +78,22 @@ public class Room {
     }
 
     public boolean checkStart() {
-        setGame(new DavinciCode(this.id, getNumberOfUsers(), this));    // 더미 데이터
+        setGameInfo(GameInfo.DAVINCI_CODE);     // 더미 데이터
 
-        if(this.game == null){
+        if(this.gameInfo == null){
             throw new IllegalArgumentException("게임이 정해지지 않았습니다.");
         }
 
-        return this.game.checkStart();
+        return this.gameInfo.checkStart(getNumberOfUsers());
     }
 
-    public void setGame(Game game) {
-        this.game = game;
+    public void setGameInfo(GameInfo gameInfo) {
+        this.gameInfo = gameInfo;
     }
 
     public void startGame(){
+        this.game = this.gameInfo.createGame(users, this);
         this.playing = true;
-        this.game.start(users);
     }
 
     public void finishGame() {
@@ -102,6 +106,20 @@ public class Room {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == null) return false;
+        if(!(obj instanceof Room)) return false;
+        if(obj == this) return true;
+
+        return ((Room) obj).getId().equals(this.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, capacity);
     }
 }
 

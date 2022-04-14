@@ -4,6 +4,7 @@ import com.example.board_game.domain.BaseTimeEntity;
 import lombok.Getter;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Getter
 @Entity
@@ -41,11 +42,15 @@ public class User extends BaseTimeEntity {
 
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof User) {
-            User user = (User) obj;
-            return user.getId().equals(this.id);
-        } else {
-            return false;
-        }
+        if(obj == null) return false;
+        if(!(obj instanceof User)) return false;
+        if(obj == this) return true;
+
+        return ((User) obj).getId().equals(this.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, email, nickname);
     }
 }

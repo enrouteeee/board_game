@@ -13,19 +13,13 @@ public class DavinciCode extends Game {
 
     private int numberOfALivePlayers;    // 1 이면 게임 종료
 
-    public DavinciCode(Long roomId, int numberOfUsers, Room room) {
-        super(roomId, numberOfUsers, room);
+    public DavinciCode(Long id, List<User> users, Room room) {
+        super(id, users, room);
     }
 
     @Override
-    public boolean checkStart() {
-        int num = getNumberOfUsers();
-        return num <= 4 && num >= 2;
-    }
-
-    @Override
-    public void start(List<User> users) {
-        int numberOfUsers = getNumberOfUsers();
+    public void init(List<User> users) {
+        int numberOfUsers = users.size();
         players = new ArrayList<>();
         for (User user : users) {
             this.players.add(new Player(user));
@@ -44,7 +38,7 @@ public class DavinciCode extends Game {
 
             if(--numberOfALivePlayers == 1) {
                 System.out.println("게임 끝");
-                getRoom().finishGame();
+                finish();
             }
         }
     }
@@ -89,7 +83,7 @@ public class DavinciCode extends Game {
             //게임 종료 이벤트
             if(--numberOfALivePlayers == 1) {
                 System.out.println("게임 끝");
-                getRoom().finishGame();
+                finish();
             }
         }
 

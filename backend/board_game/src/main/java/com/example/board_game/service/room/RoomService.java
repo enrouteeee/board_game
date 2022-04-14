@@ -67,7 +67,7 @@ public class RoomService {
         room.join(user);
     }
 
-    public Room findOne(Long roomId) {
+    private Room findOne(Long roomId) {
         return roomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 방입니다."));
     }

@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
-public class RoomRepositoryMemory implements RoomRepository {
+public class MemoryRoomRepository implements RoomRepository {
     private static final Map<Long, Room> store = new ConcurrentHashMap<>();
     private static long sequence = 0L;
 
