@@ -5,6 +5,7 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 public class Player {
@@ -93,5 +94,19 @@ public class Player {
             card.flipped();
         }
         this.state = PlayerState.OUT;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == null) return false;
+        if(!(obj instanceof Player)) return false;
+        if(obj == this) return true;
+
+        return ((Player) obj).getId().equals(this.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userId, nickname);
     }
 }
