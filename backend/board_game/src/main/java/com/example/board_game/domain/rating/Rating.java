@@ -8,11 +8,10 @@ import lombok.Getter;
 import javax.persistence.*;
 
 @Getter
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames={"user_id", "gameInfo"})})
 @Entity
 public class Rating extends BaseTimeEntity {
 
-    private static final int BaseRating = 1000;
+    private static final int BaseRating = 800;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,17 +35,7 @@ public class Rating extends BaseTimeEntity {
         this.rating = BaseRating;
     }
 
-    public void updateRating(int updateRating) {
-        this.rating += updateRating;
-    }
-
-    @Override
-    public String toString() {
-        return "Rating{" +
-                "id=" + id +
-                ", rating=" + rating +
-                ", user=" + user +
-                ", gameInfo=" + gameInfo +
-                '}';
+    public void updateRating(int addRating) {
+        this.rating += addRating;
     }
 }

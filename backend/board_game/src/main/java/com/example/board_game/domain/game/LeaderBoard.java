@@ -9,7 +9,7 @@ import java.util.Arrays;
  */
 @Getter
 public class LeaderBoard {
-    private final Long[] board;     // userId list 순서대로 1,2,3, ... 등
+    private final Long[] board;
     private int count;
 
     private final GameInfo gameInfo;

@@ -47,9 +47,14 @@ public abstract class Game implements GamePublisher {
     }
 
     @Override
+    public void delete(GameObserver observer) {
+        this.observers.remove(observer);
+    }
+
+    @Override
     public void notifyGameFinish() {
         for (GameObserver observer : this.observers) {
-            observer.gameFinished(this);
+            observer.update(this);
         }
     }
 }
