@@ -2,32 +2,59 @@ package com.example.board_game.domain.game;
 
 import com.example.board_game.domain.room.Room;
 import com.example.board_game.domain.user.User;
+import com.example.board_game.observer.game.GameObserver;
+import com.example.board_game.observer.game.GamePublisher;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Game {
+public abstract class Game implements GamePublisher {
     private Long id;
-    private Room room;
+    private LeaderBoard leaderBoard;
 
-    public Game(Long id, List<User> users, Room room) {
-        this.id = id;
-        this.room = room;
-        init(users);
+    private final List<GameObserver> observers = new ArrayList<>();
+
+    public Game(Room room) {
+        this.id = room.getId();
+        this.leaderBoard = new LeaderBoard(room.getNumberOfUsers(), room.getGameInfo());
+        init(room.getUsers());
     }
 
     public abstract void init(List<User> users);
 
     public abstract void exitPlayer(Long playerId);
 
+    public void updateLeaderBoard(Long playerId) {
+        leaderBoard.update(playerId);
+    }
+
     public void finish() {
-        getRoom().finishGame();
+        notifyGameFinish();
     }
 
     public Long getId() {
         return this.id;
     }
 
-    private Room getRoom() {
-        return this.room;
+    public LeaderBoard getLeaderBoard() {
+        return this.leaderBoard;
+    }
+
+
+    @Override
+    public void add(GameObserver observer) {
+        this.observers.add(observer);
+    }
+
+    @Override
+    public void delete(GameObserver observer) {
+        this.observers.remove(observer);
+    }
+
+    @Override
+    public void notifyGameFinish() {
+        for (GameObserver observer : this.observers) {
+            observer.update(this);
+        }
     }
 }

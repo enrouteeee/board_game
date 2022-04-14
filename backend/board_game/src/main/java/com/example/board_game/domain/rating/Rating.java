@@ -1,5 +1,6 @@
 package com.example.board_game.domain.rating;
 
+import com.example.board_game.domain.BaseTimeEntity;
 import com.example.board_game.domain.game.GameInfo;
 import com.example.board_game.domain.user.User;
 import lombok.Getter;
@@ -8,7 +9,7 @@ import javax.persistence.*;
 
 @Getter
 @Entity
-public class Rating {
+public class Rating extends BaseTimeEntity {
 
     private static final int BaseRating = 800;
 

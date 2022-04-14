@@ -10,6 +10,7 @@ import com.example.board_game.dto.room.CreateOrUpdateRoomDto;
 import com.example.board_game.dto.room.GetRoomHeaderDto;
 import com.example.board_game.dto.room.GetRoomHeaderListDto;
 import com.example.board_game.dto.room.GetRoomInfoDto;
+import com.example.board_game.service.rating.RatingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,7 @@ import java.util.List;
 public class RoomService {
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
+    private final RatingService ratingService;
 
     public GetRoomHeaderDto createRoom(CreateOrUpdateRoomDto dto, UserDto user) {
         User findUser = userRepository.findByEmail(user.getEmail())
@@ -79,7 +81,9 @@ public class RoomService {
     public boolean startGame(Long roomId) {
         Room room = findOne(roomId);
         if(room.checkStart()){
-            room.startGame();
+            Game game = room.startGame();
+            game.add(room);
+            game.add(ratingService);
             return true;
         } else {
             return false;
