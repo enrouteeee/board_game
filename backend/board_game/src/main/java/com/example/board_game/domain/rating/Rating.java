@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Entity
 public class Rating extends BaseTimeEntity {
 
-    private static final int BaseRating = 800;
+    private static final int BaseRating = 1000;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,7 +35,17 @@ public class Rating extends BaseTimeEntity {
         this.rating = BaseRating;
     }
 
-    public void updateRating(int addRating) {
-        this.rating += addRating;
+    public void updateRating(int updateRating) {
+        this.rating += updateRating;
+    }
+
+    @Override
+    public String toString() {
+        return "Rating{" +
+                "id=" + id +
+                ", rating=" + rating +
+                ", user=" + user +
+                ", gameInfo=" + gameInfo +
+                '}';
     }
 }
