@@ -126,7 +126,7 @@ public class Room implements GameObserver {
     }
 
     @Override
-    public void update(Game game) {
+    public void gameFinished(Game game) {
         finishGame();
     }
 }
