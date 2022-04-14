@@ -1,6 +1,7 @@
 package com.example.board_game.domain.room;
 
-import com.example.board_game.domain.game.GameType;
+import com.example.board_game.domain.game.Game;
+import com.example.board_game.domain.game.GameInfo;
 import com.example.board_game.domain.user.User;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,7 +18,8 @@ public class Room {
     private User owner;
     private List<User> users = new ArrayList<>();
 
-    private GameType gameType;
+    private GameInfo gameInfo;
+    private Game game;
 
     private boolean playing;    //게임 중인지 아닌지
 
@@ -75,24 +77,26 @@ public class Room {
     }
 
     public boolean checkStart() {
-        setGame(GameType.DAVINCI_CODE);     // 더미 데이터
+        setGameInfo(GameInfo.DAVINCI_CODE);     // 더미 데이터
 
-        if(this.gameType == null){
+        if(this.gameInfo == null){
             throw new IllegalArgumentException("게임이 정해지지 않았습니다.");
         }
 
-        return this.gameType.checkStart(getNumberOfUsers());
+        return this.gameInfo.checkStart(getNumberOfUsers());
     }
 
-    public void setGame(GameType game) {
-        this.gameType = game;
+    public void setGameInfo(GameInfo gameInfo) {
+        this.gameInfo = gameInfo;
     }
 
     public void startGame(){
+        this.game = this.gameInfo.createGame(users, this);
         this.playing = true;
     }
 
     public void finishGame() {
+        this.game = null;
         this.playing = false;
     }
 

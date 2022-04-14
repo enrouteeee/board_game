@@ -9,13 +9,10 @@ public abstract class Game {
     private Long id;
     private Room room;
 
-    public Game(List<User> users, Room room) {
+    public Game(Long id, List<User> users, Room room) {
+        this.id = id;
         this.room = room;
         init(users);
-    }
-
-    protected void setId(Long id) {
-        this.id = id;
     }
 
     public abstract void init(List<User> users);

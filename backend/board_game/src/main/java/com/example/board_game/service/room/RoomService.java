@@ -1,6 +1,7 @@
 package com.example.board_game.service.room;
 
 import com.example.board_game.auth.UserDto;
+import com.example.board_game.domain.game.Game;
 import com.example.board_game.domain.room.Room;
 import com.example.board_game.domain.room.RoomRepository;
 import com.example.board_game.domain.user.User;
@@ -9,7 +10,6 @@ import com.example.board_game.dto.room.CreateOrUpdateRoomDto;
 import com.example.board_game.dto.room.GetRoomHeaderDto;
 import com.example.board_game.dto.room.GetRoomHeaderListDto;
 import com.example.board_game.dto.room.GetRoomInfoDto;
-import com.example.board_game.service.game.GameService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +21,6 @@ import java.util.List;
 public class RoomService {
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
-    private final GameService gameService;
 
     public GetRoomHeaderDto createRoom(CreateOrUpdateRoomDto dto, UserDto user) {
         User findUser = userRepository.findByEmail(user.getEmail())
@@ -73,11 +72,14 @@ public class RoomService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 방입니다."));
     }
 
+    public Game findGame(Long roomId) {
+        return findOne(roomId).getGame();
+    }
+
     public boolean startGame(Long roomId) {
         Room room = findOne(roomId);
         if(room.checkStart()){
             room.startGame();
-            gameService.createGame(room.getGameType(), room.getUsers(), room);
             return true;
         } else {
             return false;

@@ -13,8 +13,8 @@ public class DavinciCode extends Game {
 
     private int numberOfALivePlayers;    // 1 이면 게임 종료
 
-    public DavinciCode(List<User> users, Room room) {
-        super(users, room);
+    public DavinciCode(Long id, List<User> users, Room room) {
+        super(id, users, room);
     }
 
     @Override
