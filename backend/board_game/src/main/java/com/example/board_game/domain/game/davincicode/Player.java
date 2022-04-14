@@ -13,7 +13,6 @@ public class Player {
     private String nickname;
     private List<Card> cards = new ArrayList<>();
     private Card selectCard;
-
     private PlayerState state;
 
     private int lastAddedCardIndex;

@@ -13,8 +13,8 @@ public class DavinciCode extends Game {
 
     private int numberOfALivePlayers;    // 1 이면 게임 종료
 
-    public DavinciCode(Long id, List<User> users, Room room) {
-        super(id, users, room);
+    public DavinciCode(Room room) {
+        super(room);
     }
 
     @Override
@@ -35,12 +35,19 @@ public class DavinciCode extends Game {
         Player player = findPlayer(playerId);
         if(player.getState() == PlayerState.PLAYING) {
             player.AllFlip();
+            updateLeaderBoard(player.getId());
 
             if(--numberOfALivePlayers == 1) {
-                System.out.println("게임 끝");
-                finish();
+                finishGame();
             }
         }
+    }
+
+    private void finishGame() {
+        Player winner = findWinner();
+        updateLeaderBoard(winner.getId());
+        System.out.println("게임 끝");
+        finish();
     }
 
     /*
@@ -79,11 +86,10 @@ public class DavinciCode extends Game {
 
         // 아웃된 플레이어 확인
         if(player.getState() == PlayerState.OUT){
-            System.out.println(numberOfALivePlayers);
+            updateLeaderBoard(player.getId());
             //게임 종료 이벤트
             if(--numberOfALivePlayers == 1) {
-                System.out.println("게임 끝");
-                finish();
+                finishGame();
             }
         }
 
@@ -101,6 +107,17 @@ public class DavinciCode extends Game {
             if(player.getId().equals(id)){
                 return player;
             }
+        }
+        return null;
+    }
+
+    public Player findWinner() {
+        if(numberOfALivePlayers != 1)
+            return null;
+
+        for (Player player : players) {
+            if(player.getState() == PlayerState.PLAYING)
+                return player;
         }
         return null;
     }

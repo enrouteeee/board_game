@@ -3,6 +3,7 @@ package com.example.board_game.domain.room;
 import com.example.board_game.domain.game.Game;
 import com.example.board_game.domain.game.GameInfo;
 import com.example.board_game.domain.user.User;
+import com.example.board_game.observer.game.GameObserver;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Getter
-public class Room {
+public class Room implements GameObserver {
     private Long id;
     private String name;
     private int capacity;
@@ -91,9 +92,11 @@ public class Room {
         this.gameInfo = gameInfo;
     }
 
-    public void startGame(){
-        this.game = this.gameInfo.createGame(users, this);
+    public Game startGame(){
+        this.game = this.gameInfo.createGame(this);
         this.playing = true;
+
+        return this.game;
     }
 
     public void finishGame() {
@@ -120,6 +123,11 @@ public class Room {
     @Override
     public int hashCode() {
         return Objects.hash(id, name, capacity);
+    }
+
+    @Override
+    public void gameFinished(Game game) {
+        finishGame();
     }
 }
 
