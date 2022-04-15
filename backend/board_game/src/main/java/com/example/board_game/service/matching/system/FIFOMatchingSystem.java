@@ -11,7 +11,7 @@ import java.util.List;
 @Component
 public class FIFOMatchingSystem implements MatchingSystem {
 
-    MatchingQueue matchingQueue;
+    private MatchingQueue matchingQueue;
 
     @PostConstruct
     public void init() {
