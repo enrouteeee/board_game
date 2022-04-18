@@ -187,7 +187,7 @@ Room 은 Game을 의존하고 있다. 게임이 종료되었을 때 Game을 null
 <br/>
 게임이 끝난경우 Room의 상태를 게임중에서 모집중으로 변경해야하고, RatingService에서 게임 결과에 따른 점수 결과를 업데이트 해야한다.<br/>
 게임 종료가 발생했을때 해당 게임(Publisher)는 Room과 RatingService(Observer)에 notify해준다.<br/>
-옵저버 패턴을 이용해서 느슨한 결합으로 구현했지만 계속된 update가 아닌 단 한번의 notify이다. Spring Event를 공부해 보도록 하도록 하자.(ex. GameFinishedEvent)
+옵저버 패턴을 이용해서 느슨한 결합으로 구현했지만 계속된 update가 아닌 단 한번의 notify이다. Spring Event를 공부해 보자.<br/>(ex. GameFinishedEvent)
 
 <br/><br/>
 [시뮬레이션 코드 링크](https://github.com/enrouteeee/board_game/tree/main/test/src/rating)
@@ -253,12 +253,12 @@ public class MatchingQueue {
 }
 ```
 <br/>
-<img width="500" alt="매칭그림" src="https://user-images.githubusercontent.com/87449055/163857823-967cfb81-5869-4c30-9da5-889a66b4a4f9.png">
+<img width="500" alt="매칭그림" src="https://user-images.githubusercontent.com/87449055/163864076-ca028db8-d24b-487f-bde7-69624334770f.png">
 <br/>
 
 각 시스템은 적절한 MatchingQueue를 생성한다. 매칭큐는 벡터의 리스트로 이루어져 있다. 각 벡터에 같은 조건(게임 종류, 인원수, 점수 등)의 유저들이 추가되며, 인원수가 만족되면 리턴된다.<br/>
-다차원 배열은 2차원 배열로 나타낼수 있다. int[][][] array = new int[a][b][c] 일때 array[x][y][z] = array[x*b*c + y*c + z] 이다.<br/>
-이를 이용해서 매칭 큐를 초기화 한다. 예를 들어 매칭 조건이 3가지가 있고, 각 조건은 3,5,6 가지 상태를 가질 수 있다고 한다면 queue[3][5][6] = queue[3x5x6] 로 초기화 할 수 있다.
+다차원 배열은 2차원 배열로 나타낼수 있다. int[][][] array = new int[a][b][c] 일때 array[x][y][z] => array[x*b*c + y*c + z] 이다.<br/>
+이를 이용해서 매칭 큐를 초기화 한다. 예를 들어 매칭 조건이 3가지가 있고, 각 조건은 3,5,6 가지 상태를 가질 수 있다고 한다면 queue[3][5][6] => queue[3x5x6] 로 초기화 할 수 있고, 선택한 조건이 2,4,3 인 경우 queue[(2-1)x5x6 + (4-1)x6 + (3-1)] 에 넣어준다.
 
 <br/><br/>
 
