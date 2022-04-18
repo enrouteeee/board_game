@@ -35,9 +35,10 @@ public class RatingService implements GameObserver {
 
         List<Rating> ratings = new ArrayList<>();
 
-        int maxScore = 50;
-        int minScore = 5;
-        int standardRating = 100;
+        int maxScore = 120;
+        int minScore = 14;
+        int standardRating = 240;
+        double modScore = 2.6;
 
         for (Long uid : board) {
             Rating rating = findRating(uid, leaderBoard.getGameInfo());
@@ -65,6 +66,7 @@ public class RatingService implements GameObserver {
                     } else {
                         updateRating += minScore;
                     }
+                    updateRating *= 1.5;
                 } else if (i < j) {
                     int iRating = ratings.get(i).getRating();
                     int jRating = ratings.get(j).getRating();
@@ -84,6 +86,7 @@ public class RatingService implements GameObserver {
                         updateRating -= maxScore;
                     }
                 }
+                updateRating /= modScore;
             }
             updateRating /= (ratings.size() -1);
             ratings.get(i).updateRating(updateRating);
