@@ -40,15 +40,9 @@ public abstract class Game implements GamePublisher {
         return this.leaderBoard;
     }
 
-
     @Override
     public void add(GameObserver observer) {
         this.observers.add(observer);
-    }
-
-    @Override
-    public void delete(GameObserver observer) {
-        this.observers.remove(observer);
     }
 
     @Override

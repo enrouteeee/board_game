@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @RequiredArgsConstructor
 @Service
@@ -24,11 +25,19 @@ public class RoomService {
     private final UserRepository userRepository;
     private final RatingService ratingService;
 
+    private final String[] roomNameExample = {"아무나 들어와", "즐거운 게임", "날 이겨봐"};
+
     public GetRoomHeaderDto createRoom(CreateOrUpdateRoomDto dto, UserDto user) {
         User findUser = userRepository.findByEmail(user.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다"));
 
-        Room room = new Room(dto.getName(), dto.getCapacity(), findUser);
+        Room room;
+        if(dto.getName() == null || dto.getName().equals("")){
+            Random rd = new Random();
+            room = new Room(roomNameExample[rd.nextInt(roomNameExample.length)], dto.getCapacity(), findUser);
+        } else {
+            room = new Room(dto.getName(), dto.getCapacity(), findUser);
+        }
 
         return new GetRoomHeaderDto(roomRepository.save(room));
     }

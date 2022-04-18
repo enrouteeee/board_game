@@ -8,6 +8,7 @@ import lombok.Getter;
 import javax.persistence.*;
 
 @Getter
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames={"user_id", "gameInfo"})})
 @Entity
 public class Rating extends BaseTimeEntity {
 

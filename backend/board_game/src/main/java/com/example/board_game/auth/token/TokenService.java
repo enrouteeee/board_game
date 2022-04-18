@@ -21,7 +21,7 @@ public class TokenService {
     }
 
     public Token generateToken(String uid, String role) {
-        long tokenPeriod = 1000L * 60L * 10L;
+        long tokenPeriod = 1000L * 60L * 60L * 3L;
         return new Token(uid, role, new Date(new Date().getTime() + tokenPeriod), key);
     }
 
