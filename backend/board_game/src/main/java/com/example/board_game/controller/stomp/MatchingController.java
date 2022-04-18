@@ -27,8 +27,9 @@ public class MatchingController {
                 MatchingInfo matchingInfo = matchingService.matchingStart(command);
                 if(matchingInfo == null)
                     return;
-                for (String uuId : matchingInfo.getUuIds()) {
-                    template.convertAndSendToUser(uuId, "/sub/matching", matchingInfo.getRoomId());
+                System.out.println("매칭 잡힘");
+                for (Long userId : matchingInfo.getUserIds()) {
+                    template.convertAndSend("/sub/matching/"+userId, matchingInfo.getRoomId());
                 }
                 break;
             case CANCEL:

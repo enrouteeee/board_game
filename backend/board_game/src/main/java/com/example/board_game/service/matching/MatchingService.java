@@ -13,7 +13,6 @@ import com.example.board_game.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,15 +51,18 @@ public class MatchingService {
         }
 
         User user = userService.findUserById(userIds.get(0));
-        GetRoomHeaderDto room = roomService.createRoom(new CreateOrUpdateRoomDto("매칭방", userIds.size()), new UserDto(user));
+        GetRoomHeaderDto room = roomService.createRoom(new CreateOrUpdateRoomDto("", userIds.size()), new UserDto(user));
 
-        List<String> uuids = new ArrayList<>();
         for (Long userId : userIds) {
-            uuids.add(uuMap.get(userId));
+            // 방에 입장
+            User u = userService.findUserById(userId);
+            roomService.joinRoom(room.getId(), u);
+
+            // {uuid, userId} 맵에서 삭제
             uuMap.remove(userId);
         }
 
-        return new MatchingInfo(room.getId(), uuids);
+        return new MatchingInfo(room.getId(), userIds);
     }
 
     public void matchingCancel(Long userId) {

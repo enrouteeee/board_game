@@ -7,10 +7,10 @@ import java.util.List;
 @Getter
 public class MatchingInfo {
     private Long roomId;
-    private List<String> uuIds;
+    private List<Long> userIds;
 
-    public MatchingInfo(Long roomId, List<String> uuIds) {
+    public MatchingInfo(Long roomId, List<Long> userIds) {
         this.roomId = roomId;
-        this.uuIds = uuIds;
+        this.userIds = userIds;
     }
 }
