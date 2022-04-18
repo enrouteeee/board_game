@@ -48,7 +48,7 @@ public class RatingService implements GameObserver {
         for (int i=0; i<ratings.size(); i++) {
             int updateRating = 0;
             for(int j=0; j<ratings.size(); j++) {
-                if(i > j) {
+                if(i < j) {
                     int iRating = ratings.get(i).getRating();
                     int jRating = ratings.get(j).getRating();
 
@@ -67,7 +67,7 @@ public class RatingService implements GameObserver {
                         updateRating += minScore;
                     }
                     updateRating *= 1.5;
-                } else if (i < j) {
+                } else if (i > j) {
                     int iRating = ratings.get(i).getRating();
                     int jRating = ratings.get(j).getRating();
 
